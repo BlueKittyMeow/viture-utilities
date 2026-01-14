@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- HUD vertical margin to avoid top/bottom 25% of screen -->
+    <dimen name="hud_vertical_margin">200dp</dimen>
+</resources>

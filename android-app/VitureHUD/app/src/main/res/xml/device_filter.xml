@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Filter for Viture camera device (vendor 0x35ca, product 0x1101) -->
+    <usb-device vendor-id="13770" product-id="4353" />
+    <!-- vendor-id: 0x35ca = 13770 decimal -->
+    <!-- product-id: 0x1101 = 4353 decimal -->
+</resources>

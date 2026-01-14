@@ -1,0 +1,20 @@
+#!/bin/bash
+# Test Viture camera access via Termux on phone
+
+echo "Testing Termux camera access..."
+echo ""
+echo "On your phone, open Termux and run these commands:"
+echo ""
+echo "# Install ffmpeg"
+echo "pkg install ffmpeg"
+echo ""
+echo "# Grant Termux storage access"
+echo "termux-setup-storage"
+echo ""
+echo "# Try to capture from Viture camera"
+echo "ffmpeg -f v4l2 -list_devices true -i /dev/video0"
+echo ""
+echo "# If you see the Viture camera listed, try capture:"
+echo "ffmpeg -f v4l2 -i /dev/videoX -frames:v 1 ~/storage/shared/viture_test.jpg"
+echo ""
+echo "Replace X with the Viture camera device number"

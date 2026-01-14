@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Viture HUD</string>
+    <string name="capture_button">Capture</string>
+    <string name="settings_button">Settings</string>
+    <string name="text_hint">Write your notes here...</string>
+</resources>
