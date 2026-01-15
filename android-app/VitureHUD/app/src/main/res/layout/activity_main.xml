@@ -46,20 +46,29 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Text Mode"
-            android:textSize="16sp"
+            android:text="Text"
+            android:textSize="14sp"
             android:backgroundTint="#00AA00"
-            android:layout_marginEnd="8dp" />
+            android:layout_marginEnd="4dp" />
 
         <Button
             android:id="@+id/modeCameraButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Camera Mode"
-            android:textSize="16sp"
+            android:text="Camera"
+            android:textSize="14sp"
             android:enabled="false"
-            android:alpha="0.5" />
+            android:alpha="0.5"
+            android:layout_marginEnd="4dp" />
+
+        <Button
+            android:id="@+id/modeClearButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Clear View"
+            android:textSize="14sp" />
     </LinearLayout>
 
     <!-- Text Input Area (visible in text mode) -->

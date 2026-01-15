@@ -53,6 +53,7 @@ class MainActivity : Activity() {
     private lateinit var captureButton: Button
     private lateinit var modeTextButton: Button
     private lateinit var modeCameraButton: Button
+    private lateinit var modeClearButton: Button
     private lateinit var settingsButton: Button
 
     // Display management
@@ -61,6 +62,7 @@ class MainActivity : Activity() {
     // Camera
     private var vitureCamera: VitureCamera? = null
     private var isCameraMode = false
+    private var isClearViewMode = false
 
     // Reference to current presentation
     private var hudPresentation: HUDPresentation? = null
@@ -91,6 +93,7 @@ class MainActivity : Activity() {
         captureButton = findViewById(R.id.captureButton)
         modeTextButton = findViewById(R.id.modeTextButton)
         modeCameraButton = findViewById(R.id.modeCameraButton)
+        modeClearButton = findViewById(R.id.modeClearButton)
         settingsButton = findViewById(R.id.settingsButton)
 
         // Text input listener - sync to glasses
@@ -106,6 +109,7 @@ class MainActivity : Activity() {
         // Mode buttons
         modeTextButton.setOnClickListener { switchToTextMode() }
         modeCameraButton.setOnClickListener { switchToCameraMode() }
+        modeClearButton.setOnClickListener { switchToClearViewMode() }
 
         // Capture button
         captureButton.setOnClickListener { handleCapture() }
@@ -200,6 +204,7 @@ class MainActivity : Activity() {
 
     private fun switchToTextMode() {
         isCameraMode = false
+        isClearViewMode = false
 
         // Stop camera preview
         vitureCamera?.stopPreview()
@@ -208,9 +213,11 @@ class MainActivity : Activity() {
         textInput.visibility = View.VISIBLE
         cameraPlaceholder.visibility = View.GONE
         captureButton.text = "Save Note"
+        captureButton.visibility = View.VISIBLE
         modeTextButton.backgroundTintList =
             android.content.res.ColorStateList.valueOf(0xFF00AA00.toInt())
         modeCameraButton.backgroundTintList = null
+        modeClearButton.backgroundTintList = null
 
         // Update glasses display
         hudPresentation?.apply {
@@ -233,14 +240,17 @@ class MainActivity : Activity() {
         }
 
         isCameraMode = true
+        isClearViewMode = false
 
         // Update phone UI - hide text input, show placeholder
         textInput.visibility = View.GONE
         cameraPlaceholder.visibility = View.VISIBLE
         captureButton.text = "Capture Photo"
+        captureButton.visibility = View.VISIBLE
         modeCameraButton.backgroundTintList =
             android.content.res.ColorStateList.valueOf(0xFF00AA00.toInt())
         modeTextButton.backgroundTintList = null
+        modeClearButton.backgroundTintList = null
 
         // Update glasses display to camera mode
         hudPresentation?.showCameraMode()
@@ -248,6 +258,28 @@ class MainActivity : Activity() {
         // Preview will start when surface ready callback fires
 
         Log.d(TAG, "Switched to camera mode")
+    }
+
+    private fun switchToClearViewMode() {
+        isCameraMode = false
+        isClearViewMode = true
+
+        // Stop camera preview
+        vitureCamera?.stopPreview()
+
+        // Update phone UI - show text input but hide capture button
+        textInput.visibility = View.VISIBLE
+        cameraPlaceholder.visibility = View.GONE
+        captureButton.visibility = View.GONE
+        modeTextButton.backgroundTintList = null
+        modeCameraButton.backgroundTintList = null
+        modeClearButton.backgroundTintList =
+            android.content.res.ColorStateList.valueOf(0xFF00AA00.toInt())
+
+        // Update glasses display to clear view (all black = transparent)
+        hudPresentation?.showClearView()
+
+        Log.d(TAG, "Switched to clear view mode")
     }
 
     private fun handleCapture() {

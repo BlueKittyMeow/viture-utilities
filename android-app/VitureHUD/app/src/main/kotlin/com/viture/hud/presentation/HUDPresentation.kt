@@ -55,7 +55,8 @@ class HUDPresentation(
 
     enum class HUDMode {
         TEXT,
-        CAMERA
+        CAMERA,
+        CLEAR_VIEW
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -136,6 +137,9 @@ class HUDPresentation(
     fun showCameraMode() {
         currentMode = HUDMode.CAMERA
 
+        // Show content container
+        contentContainer.visibility = View.VISIBLE
+
         // Hide text display
         textContainer.visibility = View.GONE
 
@@ -155,6 +159,9 @@ class HUDPresentation(
     fun showTextMode() {
         currentMode = HUDMode.TEXT
 
+        // Show content container
+        contentContainer.visibility = View.VISIBLE
+
         // Hide camera surface
         surfaceView?.visibility = View.GONE
 
@@ -162,6 +169,19 @@ class HUDPresentation(
         textContainer.visibility = View.VISIBLE
 
         Log.d(TAG, "Switched to text mode")
+    }
+
+    /**
+     * Switch to clear view mode.
+     * Hides all content - black background = transparent on Viture glasses.
+     */
+    fun showClearView() {
+        currentMode = HUDMode.CLEAR_VIEW
+
+        // Hide the entire content container - just black screen (transparent on glasses)
+        contentContainer.visibility = View.GONE
+
+        Log.d(TAG, "Switched to clear view mode")
     }
 
     /**
