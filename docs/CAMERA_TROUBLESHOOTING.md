@@ -503,5 +503,86 @@ adb shell dumpsys package com.viture.hud | grep permission
 
 ---
 
-**Status:** Ready to implement Option 1 (Camera2 API)
-**Next Update:** After Camera2 API testing results
+## Update: 2026-01-14 Evening - Breakthrough!
+
+### Discovery: CameraFi Uses UVC Library!
+
+Pulled and analyzed CameraFi APK:
+- **Found:** `libuvc.so` (297KB) and `libVaultUVC.so` (1MB wrapper)
+- **Conclusion:** CameraFi uses the SAME UVC approach we're using!
+
+### Solution: Patched libuvc to Accept Viture Camera
+
+**File Modified:** `android-app/UVCCamera/libuvccamera/src/main/jni/libuvc/src/device.c`
+
+**Patch Added (lines 939-953):**
+```c
+// Viture Luma Pro camera hack - vendor-specific interface (class 0x00)
+if (if_desc->bInterfaceClass == 0 && if_desc->bInterfaceSubClass == 0) {
+    uvc_device_descriptor_t* dev_desc;
+    int haveVitureCamera = 0;
+    uvc_get_device_descriptor (dev, &dev_desc);
+    // Viture vendor ID: 0x35ca, Luma Pro product ID: 0x1101
+    if (dev_desc->idVendor == 0x35ca && dev_desc->idProduct == 0x1101) {
+        haveVitureCamera = 1;
+        MARK("Detected Viture Luma Pro camera - accepting vendor-specific interface");
+    }
+    uvc_free_device_descriptor (dev_desc);
+    if (haveVitureCamera) {
+        break;
+    }
+}
+```
+
+**Pattern:** Similar to existing TIS camera hack (lines 925-937) which accepts vendor-specific class 255.
+
+### Results
+
+✅ **Camera Now Opens Successfully!**
+```
+VitureCamera: Camera opened successfully, configuring preview...
+```
+
+❌ **New Problem: No Format Descriptors**
+```
+VitureCamera: Camera reports NO supported sizes - this is unusual but may still work
+VitureCamera: Failed to set 1920x1080 MJPEG, trying YUYV: Failed to set preview size
+```
+
+### Root Cause Analysis
+
+The Viture camera:
+1. Uses vendor-specific protocol (interface class 0x00) ✓ **SOLVED**
+2. Does NOT expose standard UVC format descriptors ← **CURRENT BLOCKER**
+3. Requires custom format negotiation or streaming protocol
+
+This explains why standard UVC libraries fail - the camera opens but doesn't advertise its capabilities through UVC descriptors.
+
+### Next Steps
+
+**Option A: Reverse Engineer Format Negotiation (Medium Effort)**
+- Sniff USB traffic from CameraFi to see format negotiation
+- Identify vendor-specific control transfers
+- Implement custom format setup before streaming
+
+**Option B: Try Alternative Streaming Methods (Low Effort)**
+- Skip format negotiation, attempt direct streaming
+- Try raw bulk transfers without setPreviewSize()
+- Experiment with different initialization sequences
+
+**Option C: Deep Dive into CameraFi Code (High Effort)**
+- Decompile libVaultUVC.so to see format handling
+- Reverse engineer their protocol implementation
+
+### Camera2 API Status
+
+Tested Camera2 API approach:
+- ❌ Viture camera NOT detected as EXTERNAL camera
+- Camera2 API sees 4 cameras (all built-in phones cameras)
+- No LENS_FACING_EXTERNAL devices found
+- **Conclusion:** Android's camera service doesn't expose Viture camera
+
+---
+
+**Status:** Camera opens successfully with UVC patch! Working on format negotiation.
+**Next Update:** After format/streaming protocol investigation

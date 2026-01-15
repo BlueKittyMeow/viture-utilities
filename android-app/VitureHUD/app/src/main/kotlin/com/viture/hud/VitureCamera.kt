@@ -22,6 +22,12 @@ import kotlin.coroutines.resumeWithException
  * - Automatic frame format detection
  * - DeX mode retry logic
  * - Both callback and coroutine APIs
+ * - Camera2 API fallback for non-UVC devices
+ *
+ * Strategy:
+ * 1. Try UVC approach first (for standard UVC cameras)
+ * 2. If UVC fails with error -50 (non-UVC device), automatically fall back to Camera2 API
+ * 3. Camera2 API uses Android's native HAL/V4L2 drivers for vendor-specific cameras
  */
 class VitureCamera(private val context: Context) {
 
@@ -39,12 +45,16 @@ class VitureCamera(private val context: Context) {
         private const val CAMERA_FPS_MAX = 5
     }
 
-    // USB monitoring and camera objects
+    // USB monitoring and camera objects (UVC approach)
     private var usbMonitor: USBMonitor? = null
     private var uvcCamera: UVCCamera? = null
 
+    // Camera2 helper (fallback for non-UVC devices)
+    private var camera2Helper: Camera2Helper? = null
+
     // Connection state
     private var isConnected = false
+    private var useCamera2 = false  // Track which API is being used
 
     // Callback for camera events
     var onCameraConnected: (() -> Unit)? = null
@@ -100,14 +110,41 @@ class VitureCamera(private val context: Context) {
     }
 
     /**
-     * Initialize USB monitoring.
+     * Initialize USB monitoring and Camera2 API.
      * Call this in Activity onCreate().
      */
     fun initialize() {
+        // Initialize UVC approach (try this first for standard UVC cameras)
         if (usbMonitor == null) {
             usbMonitor = USBMonitor(context, deviceListener)
             usbMonitor?.register()
             Log.d(TAG, "USB monitor initialized")
+        }
+
+        // Initialize Camera2 fallback (for vendor-specific cameras like Viture)
+        if (camera2Helper == null) {
+            camera2Helper = Camera2Helper(context).apply {
+                onCameraConnected = {
+                    isConnected = true
+                    this@VitureCamera.onCameraConnected?.invoke()
+                }
+                onCameraDisconnected = {
+                    isConnected = false
+                    this@VitureCamera.onCameraDisconnected?.invoke()
+                }
+                onCameraError = { error ->
+                    this@VitureCamera.onCameraError?.invoke(error)
+                }
+                initialize()
+            }
+            Log.d(TAG, "Camera2 helper initialized")
+
+            // If external camera is available via Camera2, use that approach
+            if (camera2Helper?.isExternalCameraAvailable() == true) {
+                Log.d(TAG, "External USB camera detected via Camera2 API - using Camera2 approach")
+                useCamera2 = true
+                camera2Helper?.openCamera()
+            }
         }
     }
 
@@ -140,7 +177,7 @@ class VitureCamera(private val context: Context) {
     }
 
     /**
-     * Open and configure the camera.
+     * Open and configure the camera (UVC approach).
      */
     private fun openCamera(ctrlBlock: USBMonitor.UsbControlBlock) {
         try {
@@ -152,33 +189,74 @@ class VitureCamera(private val context: Context) {
 
             Log.d(TAG, "Camera opened successfully, configuring preview...")
 
-            // Query supported sizes (for debugging)
-            uvcCamera?.supportedSizeList?.forEach { size ->
-                Log.d(TAG, "Supported: ${size.width}x${size.height} type=${size.type}")
+            // Query ALL supported sizes (for debugging)
+            val supportedSizes = uvcCamera?.supportedSizeList
+            if (supportedSizes.isNullOrEmpty()) {
+                Log.w(TAG, "Camera reports NO supported sizes - this is unusual but may still work")
+            } else {
+                Log.d(TAG, "Camera reports ${supportedSizes.size} supported size/format combinations:")
+                supportedSizes.forEach { size ->
+                    Log.d(TAG, "  ${size.width}x${size.height} type=${size.type}")
+                }
             }
 
-            // Detect best format
-            val format = detectBestFormat()
-
-            // Configure preview size and frame rate
-            uvcCamera?.setPreviewSize(
-                CAMERA_WIDTH,
-                CAMERA_HEIGHT,
-                CAMERA_FPS_MIN,
-                CAMERA_FPS_MAX,
-                format,
-                UVCCamera.DEFAULT_BANDWIDTH
-            )
+            // Try to configure preview - use MJPEG format first
+            try {
+                // Try 1920x1080 MJPEG
+                uvcCamera?.setPreviewSize(
+                    CAMERA_WIDTH,
+                    CAMERA_HEIGHT,
+                    CAMERA_FPS_MIN,
+                    CAMERA_FPS_MAX,
+                    UVCCamera.FRAME_FORMAT_MJPEG,
+                    UVCCamera.DEFAULT_BANDWIDTH
+                )
+                Log.d(TAG, "Preview configured: ${CAMERA_WIDTH}x${CAMERA_HEIGHT} MJPEG")
+            } catch (e: Exception) {
+                Log.w(TAG, "Failed to set 1920x1080 MJPEG, trying YUYV: ${e.message}")
+                try {
+                    // Try 1920x1080 YUYV
+                    uvcCamera?.setPreviewSize(
+                        CAMERA_WIDTH,
+                        CAMERA_HEIGHT,
+                        CAMERA_FPS_MIN,
+                        CAMERA_FPS_MAX,
+                        UVCCamera.FRAME_FORMAT_YUYV,
+                        UVCCamera.DEFAULT_BANDWIDTH
+                    )
+                    Log.d(TAG, "Preview configured: ${CAMERA_WIDTH}x${CAMERA_HEIGHT} YUYV")
+                } catch (e2: Exception) {
+                    Log.e(TAG, "Failed to set any preview format, throwing exception")
+                    throw e2
+                }
+            }
 
             isConnected = true
+            useCamera2 = false
             onCameraConnected?.invoke()
 
-            Log.d(TAG, "Camera configured: ${CAMERA_WIDTH}x${CAMERA_HEIGHT} @ ${CAMERA_FPS_MAX}fps")
+            Log.d(TAG, "Camera configured (UVC): ${CAMERA_WIDTH}x${CAMERA_HEIGHT} @ ${CAMERA_FPS_MAX}fps")
 
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to open camera", e)
-            onCameraError?.invoke("Failed to open camera: ${e.message}")
-            closeCamera()
+            Log.e(TAG, "Failed to open camera via UVC", e)
+
+            // Check if this is error -50 (INVALID_DEVICE - non-UVC camera)
+            if (e.message?.contains("result=-50") == true) {
+                Log.d(TAG, "UVC error -50 detected (non-UVC device), falling back to Camera2 API")
+
+                // Fall back to Camera2 API
+                if (camera2Helper?.isExternalCameraAvailable() == true) {
+                    Log.d(TAG, "Attempting Camera2 API fallback...")
+                    useCamera2 = true
+                    camera2Helper?.openCamera()
+                } else {
+                    onCameraError?.invoke("Camera not compatible with UVC and not detected via Camera2")
+                    closeCamera()
+                }
+            } else {
+                onCameraError?.invoke("Failed to open camera: ${e.message}")
+                closeCamera()
+            }
         }
     }
 
@@ -188,11 +266,19 @@ class VitureCamera(private val context: Context) {
      * @param surface Surface to render preview (from SurfaceView or TextureView)
      */
     fun startPreview(surface: Surface) {
-        startPreviewWithRetry(surface, attempts = 3)
+        if (useCamera2) {
+            // Use Camera2 API
+            Log.d(TAG, "Starting preview (Camera2)")
+            camera2Helper?.startPreview(surface)
+        } else {
+            // Use UVC API with retry logic
+            Log.d(TAG, "Starting preview (UVC)")
+            startPreviewWithRetry(surface, attempts = 3)
+        }
     }
 
     /**
-     * Start preview with retry logic for DeX mode timing issues.
+     * Start preview with retry logic for DeX mode timing issues (UVC only).
      */
     private fun startPreviewWithRetry(surface: Surface, attempts: Int) {
         try {
@@ -203,7 +289,7 @@ class VitureCamera(private val context: Context) {
 
             uvcCamera?.setPreviewDisplay(surface)
             uvcCamera?.startPreview()
-            Log.d(TAG, "Preview started successfully")
+            Log.d(TAG, "Preview started successfully (UVC)")
 
         } catch (e: Exception) {
             if (attempts > 0) {
@@ -224,8 +310,13 @@ class VitureCamera(private val context: Context) {
      */
     fun stopPreview() {
         try {
-            uvcCamera?.stopPreview()
-            Log.d(TAG, "Preview stopped")
+            if (useCamera2) {
+                camera2Helper?.stopPreview()
+                Log.d(TAG, "Preview stopped (Camera2)")
+            } else {
+                uvcCamera?.stopPreview()
+                Log.d(TAG, "Preview stopped (UVC)")
+            }
         } catch (e: Exception) {
             Log.e(TAG, "Error stopping preview", e)
         }
@@ -244,23 +335,31 @@ class VitureCamera(private val context: Context) {
                 return
             }
 
-            // Set one-shot frame callback to capture a single frame
-            // Use PIXEL_FORMAT_RAW to get raw MJPEG data without conversion
-            var captured = false
-            uvcCamera?.setFrameCallback({ frame ->
-                if (!captured) {
-                    captured = true
-                    // Convert ByteBuffer to ByteArray
-                    val data = ByteArray(frame.remaining())
-                    frame.get(data)
-                    Log.d(TAG, "Image captured: ${data.size} bytes")
+            if (useCamera2) {
+                // Use Camera2 API
+                Log.d(TAG, "Capturing image (Camera2)")
+                camera2Helper?.captureStillImage(callback)
+            } else {
+                // Use UVC API
+                Log.d(TAG, "Capturing image (UVC)")
+                // Set one-shot frame callback to capture a single frame
+                // Use PIXEL_FORMAT_RAW to get raw MJPEG data without conversion
+                var captured = false
+                uvcCamera?.setFrameCallback({ frame ->
+                    if (!captured) {
+                        captured = true
+                        // Convert ByteBuffer to ByteArray
+                        val data = ByteArray(frame.remaining())
+                        frame.get(data)
+                        Log.d(TAG, "Image captured (UVC): ${data.size} bytes")
 
-                    // Clear callback after capturing
-                    uvcCamera?.setFrameCallback(null, UVCCamera.PIXEL_FORMAT_RAW)
+                        // Clear callback after capturing
+                        uvcCamera?.setFrameCallback(null, UVCCamera.PIXEL_FORMAT_RAW)
 
-                    callback(data)
-                }
-            }, UVCCamera.PIXEL_FORMAT_RAW)
+                        callback(data)
+                    }
+                }, UVCCamera.PIXEL_FORMAT_RAW)
+            }
 
         } catch (e: Exception) {
             Log.e(TAG, "Failed to capture image", e)
@@ -281,23 +380,33 @@ class VitureCamera(private val context: Context) {
                 return@suspendCancellableCoroutine
             }
 
-            // Set one-shot frame callback
-            // Use PIXEL_FORMAT_RAW to get raw MJPEG data without conversion
-            var captured = false
-            uvcCamera?.setFrameCallback({ frame ->
-                if (!captured) {
-                    captured = true
-                    // Convert ByteBuffer to ByteArray
-                    val data = ByteArray(frame.remaining())
-                    frame.get(data)
-                    Log.d(TAG, "Image captured (suspend): ${data.size} bytes")
-
-                    // Clear callback after capturing
-                    uvcCamera?.setFrameCallback(null, UVCCamera.PIXEL_FORMAT_RAW)
-
+            if (useCamera2) {
+                // Use Camera2 API - delegate to callback version
+                Log.d(TAG, "Capturing image suspend (Camera2)")
+                camera2Helper?.captureStillImage { data ->
                     continuation.resume(data)
                 }
-            }, UVCCamera.PIXEL_FORMAT_RAW)
+            } else {
+                // Use UVC API
+                Log.d(TAG, "Capturing image suspend (UVC)")
+                // Set one-shot frame callback
+                // Use PIXEL_FORMAT_RAW to get raw MJPEG data without conversion
+                var captured = false
+                uvcCamera?.setFrameCallback({ frame ->
+                    if (!captured) {
+                        captured = true
+                        // Convert ByteBuffer to ByteArray
+                        val data = ByteArray(frame.remaining())
+                        frame.get(data)
+                        Log.d(TAG, "Image captured suspend (UVC): ${data.size} bytes")
+
+                        // Clear callback after capturing
+                        uvcCamera?.setFrameCallback(null, UVCCamera.PIXEL_FORMAT_RAW)
+
+                        continuation.resume(data)
+                    }
+                }, UVCCamera.PIXEL_FORMAT_RAW)
+            }
 
         } catch (e: Exception) {
             Log.e(TAG, "Failed to capture image (suspend)", e)
@@ -310,11 +419,16 @@ class VitureCamera(private val context: Context) {
      */
     private fun closeCamera() {
         try {
-            uvcCamera?.stopPreview()
-            uvcCamera?.close()
-            uvcCamera?.destroy()
-            uvcCamera = null
-            Log.d(TAG, "Camera closed")
+            if (useCamera2) {
+                // Camera2Helper has its own close logic in release()
+                Log.d(TAG, "Camera closed (Camera2)")
+            } else {
+                uvcCamera?.stopPreview()
+                uvcCamera?.close()
+                uvcCamera?.destroy()
+                uvcCamera = null
+                Log.d(TAG, "Camera closed (UVC)")
+            }
         } catch (e: Exception) {
             Log.e(TAG, "Error closing camera", e)
         }
@@ -329,7 +443,10 @@ class VitureCamera(private val context: Context) {
         usbMonitor?.unregister()
         usbMonitor?.destroy()
         usbMonitor = null
+        camera2Helper?.release()
+        camera2Helper = null
         isConnected = false
+        useCamera2 = false
         Log.d(TAG, "VitureCamera released")
     }
 

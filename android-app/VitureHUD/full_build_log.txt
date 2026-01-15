@@ -1,0 +1,1117 @@
+
+> Configure project :libuvccamera
+executing ndkBuild
+executing ndkBuild clean
+
+> Task :app:clean
+
+> Task :libuvccamera:ndkClean
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+Android NDK: WARNING: APP_PLATFORM android-21 is higher than android:minSdkVersion 14 in ./AndroidManifest.xml. NDK binaries will *not* be compatible with devices older than android-21. See https://android.googlesource.com/platform/ndk/+/master/docs/user/common_problems.md for more information.    
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Clean          : UVCCamera [armeabi-v7a]
+[armeabi-v7a] Clean          : jpeg-turbo1500 [armeabi-v7a]
+[armeabi-v7a] Clean          : jpeg-turbo1500_static [armeabi-v7a]
+[armeabi-v7a] Clean          : usb100 [armeabi-v7a]
+[armeabi-v7a] Clean          : usb100_static [armeabi-v7a]
+[armeabi-v7a] Clean          : uvc [armeabi-v7a]
+[armeabi-v7a] Clean          : uvc_static [armeabi-v7a]
+[arm64-v8a] Clean          : UVCCamera [arm64-v8a]
+[arm64-v8a] Clean          : jpeg-turbo1500 [arm64-v8a]
+[arm64-v8a] Clean          : jpeg-turbo1500_static [arm64-v8a]
+[arm64-v8a] Clean          : usb100 [arm64-v8a]
+[arm64-v8a] Clean          : usb100_static [arm64-v8a]
+[arm64-v8a] Clean          : uvc [arm64-v8a]
+[arm64-v8a] Clean          : uvc_static [arm64-v8a]
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+
+> Task :libuvccamera:clean
+> Task :usbCameraCommon:clean
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:checkKotlinGradlePluginConfigurationErrors
+> Task :app:dataBindingMergeDependencyArtifactsDebug
+> Task :app:generateDebugResValues
+> Task :app:generateDebugResources
+> Task :libuvccamera:preBuild UP-TO-DATE
+> Task :libuvccamera:preDebugBuild UP-TO-DATE
+> Task :libuvccamera:generateDebugResValues
+> Task :libuvccamera:generateDebugResources
+> Task :libuvccamera:packageDebugResources
+> Task :usbCameraCommon:preBuild UP-TO-DATE
+> Task :usbCameraCommon:preDebugBuild UP-TO-DATE
+> Task :usbCameraCommon:generateDebugResValues
+> Task :usbCameraCommon:generateDebugResources
+> Task :usbCameraCommon:packageDebugResources
+> Task :app:packageDebugResources
+> Task :libuvccamera:processDebugNavigationResources
+> Task :usbCameraCommon:processDebugNavigationResources
+> Task :app:processDebugNavigationResources
+> Task :libuvccamera:parseDebugLocalResources
+> Task :app:parseDebugLocalResources
+> Task :libuvccamera:writeDebugAarMetadata
+> Task :usbCameraCommon:writeDebugAarMetadata
+> Task :usbCameraCommon:parseDebugLocalResources
+> Task :libuvccamera:generateDebugRFile
+> Task :app:compileDebugNavigationResources
+> Task :usbCameraCommon:generateDebugRFile
+> Task :app:checkDebugAarMetadata
+> Task :app:mapDebugSourceSetPaths
+> Task :app:createDebugCompatibleScreenManifests
+> Task :app:extractDeepLinksDebug
+> Task :libuvccamera:extractDeepLinksDebug
+> Task :usbCameraCommon:extractDeepLinksDebug
+
+> Task :libuvccamera:processDebugManifest
+package="com.serenegiant.uvccamera" found in source AndroidManifest.xml: /home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main/AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="com.serenegiant.uvccamera" from the source AndroidManifest.xml: /home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main/AndroidManifest.xml.
+/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main/AndroidManifest.xml:29:5-31:41 Warning:
+	uses-sdk:minSdkVersion value (14) specified in the manifest file is ignored. It is overridden by the value declared in the DSL or the variant API, or 1 if not declared/present. Current value is (26).
+/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main/AndroidManifest.xml:29:5-31:41 Warning:
+	uses-sdk:targetSdkVersion value (22) specified in the manifest file is ignored. It is overridden by the value declared in the DSL or the variant API, or 1 if not declared/present. Current value is (34).
+
+> Task :usbCameraCommon:processDebugManifest
+package="com.serenegiant.usbcameracommon" found in source AndroidManifest.xml: /home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/usbCameraCommon/src/main/AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="com.serenegiant.usbcameracommon" from the source AndroidManifest.xml: /home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/usbCameraCommon/src/main/AndroidManifest.xml.
+
+> Task :libuvccamera:compileDebugLibraryResources
+> Task :app:mergeDebugResources
+> Task :app:processDebugMainManifest
+> Task :app:dataBindingGenBaseClassesDebug
+> Task :app:processDebugManifest
+> Task :usbCameraCommon:compileDebugLibraryResources
+> Task :libuvccamera:javaPreCompileDebug
+
+> Task :libuvccamera:ndkBuild
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+Android NDK: WARNING: APP_PLATFORM android-21 is higher than android:minSdkVersion 14 in ./AndroidManifest.xml. NDK binaries will *not* be compatible with devices older than android-21. See https://android.googlesource.com/platform/ndk/+/master/docs/user/common_problems.md for more information.    
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile++ arm  : UVCCamera <= _onload.cpp
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile++ arm  : UVCCamera <= utilbase.cpp
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile++ arm  : UVCCamera <= UVCButtonCallback.cpp
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile++ arm  : UVCCamera <= UVCStatusCallback.cpp
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : usb100_static <= hotplug.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : usb100_static <= sync.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : usb100_static <= strerror.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : usb100_static <= io.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : usb100_static <= core.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile++ arm  : UVCCamera <= UVCPreview.cpp
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : usb100_static <= poll_posix.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : usb100_static <= threads_posix.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jcapimin.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile++ arm  : UVCCamera <= serenegiant_usb_UVCCamera.cpp
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jcapistd.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : usb100_static <= descriptor.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : usb100_static <= android_netlink.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jcinit.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jccoefct.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jcdctmgr.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jcmainct.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jcomapi.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jccolor.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jcmaster.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile++ arm  : UVCCamera <= UVCCamera.cpp
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jcprepct.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jcmarker.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jcparam.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jcphuff.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : usb100_static <= android_usbfs.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jdapimin.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jctrans.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jdatadst.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jcsample.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jdatasrc.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jdapistd.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jddctmgr.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile++ arm  : UVCCamera <= Parameters.cpp
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jdmainct.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jdinput.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jdcoefct.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jdmaster.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jdpostct.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jdphuff.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jdtrans.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jdhuff.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jerror.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jfdctflt.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jdmarker.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jfdctfst.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jdsample.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jidctflt.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jfdctint.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jidctfst.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jidctred.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jutils.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jdcolor.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jdmerge.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jmemnobs.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jaricom.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jquant1.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jdarith.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jcarith.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jmemmgr.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jquant2.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jdatadst-tj.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jdatasrc-tj.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jsimd_arm_neon.S
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jsimd_arm.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : uvc_static <= diag.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : uvc_static <= ctrl.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : uvc_static <= frame-mjpeg.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jchuff.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= jidctint.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : uvc_static <= init.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile++      : UVCCamera <= _onload.cpp
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile++      : UVCCamera <= utilbase.cpp
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : uvc_static <= device.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= transupp.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile++      : UVCCamera <= UVCButtonCallback.cpp
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : jpeg-turbo1500_static <= turbojpeg.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile++      : UVCCamera <= UVCStatusCallback.cpp
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : uvc_static <= stream.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile++      : UVCCamera <= UVCPreview.cpp
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : usb100_static <= hotplug.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Compile arm    : uvc_static <= frame.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : usb100_static <= core.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : usb100_static <= sync.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : usb100_static <= strerror.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : usb100_static <= poll_posix.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : usb100_static <= descriptor.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : usb100_static <= threads_posix.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : usb100_static <= io.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile++      : UVCCamera <= UVCCamera.cpp
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jcapimin.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jcapistd.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile++      : UVCCamera <= serenegiant_usb_UVCCamera.cpp
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : usb100_static <= android_netlink.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jcdctmgr.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jccoefct.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jcinit.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jcmainct.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jcomapi.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jcmaster.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jccolor.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jcmarker.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jcphuff.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jcparam.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jcprepct.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jdapimin.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jctrans.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : usb100_static <= android_usbfs.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jdatadst.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jdatasrc.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile++      : UVCCamera <= Parameters.cpp
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jdapistd.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jcsample.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jddctmgr.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jdinput.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jdcoefct.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jdmainct.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jdmaster.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jdpostct.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jdtrans.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jdphuff.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jerror.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jdhuff.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jfdctflt.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jdsample.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jdmarker.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jfdctint.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jfdctfst.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jidctflt.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jidctfst.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jdmerge.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jidctred.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jutils.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jaricom.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jmemnobs.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jquant1.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jdcolor.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jmemmgr.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jdatadst-tj.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jcarith.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jquant2.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jdarith.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jdatasrc-tj.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jsimd_arm64_neon.S
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jsimd_arm64.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : uvc_static <= diag.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jidctint.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : uvc_static <= init.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= turbojpeg.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] StaticLibrary  : libusb100_static.a
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : uvc_static <= ctrl.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] StaticLibrary  : libjpeg-turbo1500_static.a
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] StaticLibrary  : libuvc_static.a
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] StaticLibrary  : libusb100_static.a
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : uvc_static <= frame-mjpeg.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : uvc_static <= device.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] SharedLibrary  : libusb100.so
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] SharedLibrary  : libusb100.so
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] SharedLibrary  : libjpeg-turbo1500.so
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Install        : libusb100.so => libs/arm64-v8a/libusb100.so
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Install        : libusb100.so => libs/armeabi-v7a/libusb100.so
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Install        : libjpeg-turbo1500.so => libs/armeabi-v7a/libjpeg-turbo1500.so
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] SharedLibrary  : libuvc.so
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Install        : libuvc.so => libs/armeabi-v7a/libuvc.so
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] SharedLibrary  : libUVCCamera.so
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[armeabi-v7a] Install        : libUVCCamera.so => libs/armeabi-v7a/libUVCCamera.so
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= jchuff.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : uvc_static <= stream.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : jpeg-turbo1500_static <= transupp.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] StaticLibrary  : libjpeg-turbo1500_static.a
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] SharedLibrary  : libjpeg-turbo1500.so
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Install        : libjpeg-turbo1500.so => libs/arm64-v8a/libjpeg-turbo1500.so
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Compile        : uvc_static <= frame.c
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] StaticLibrary  : libuvc_static.a
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] SharedLibrary  : libuvc.so
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Install        : libuvc.so => libs/arm64-v8a/libuvc.so
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] SharedLibrary  : libUVCCamera.so
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+make: Entering directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+[arm64-v8a] Install        : libUVCCamera.so => libs/arm64-v8a/libUVCCamera.so
+make: Leaving directory '/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main'
+
+> Task :libuvccamera:compileDebugJavaWithJavac
+Java compiler version 21 has deprecated support for compiling with source/target version 8.
+Try one of the following options:
+    1. [Recommended] Use Java toolchain with a lower language version
+    2. Set a higher source/target version
+    3. Use a lower version of the JDK running the build (if you're not using Java toolchain)
+For more details on how to configure these settings, see https://developer.android.com/build/jdks.
+To suppress this warning, set android.javaCompile.suppressSourceTargetDeprecationWarning=true in gradle.properties.
+warning: [options] source value 8 is obsolete and will be removed in a future release
+warning: [options] target value 8 is obsolete and will be removed in a future release
+warning: [options] To suppress warnings about obsolete options, use -Xlint:-options.
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+3 warnings
+
+> Task :usbCameraCommon:javaPreCompileDebug
+> Task :libuvccamera:bundleLibCompileToJarDebug
+> Task :app:javaPreCompileDebug
+
+> Task :usbCameraCommon:compileDebugJavaWithJavac
+Java compiler version 21 has deprecated support for compiling with source/target version 8.
+Try one of the following options:
+    1. [Recommended] Use Java toolchain with a lower language version
+    2. Set a higher source/target version
+    3. Use a lower version of the JDK running the build (if you're not using Java toolchain)
+For more details on how to configure these settings, see https://developer.android.com/build/jdks.
+To suppress this warning, set android.javaCompile.suppressSourceTargetDeprecationWarning=true in gradle.properties.
+warning: [options] source value 8 is obsolete and will be removed in a future release
+warning: [options] target value 8 is obsolete and will be removed in a future release
+warning: [options] To suppress warnings about obsolete options, use -Xlint:-options.
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+3 warnings
+
+> Task :usbCameraCommon:bundleLibCompileToJarDebug
+> Task :app:mergeDebugShaders
+> Task :app:compileDebugShaders NO-SOURCE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :libuvccamera:mergeDebugShaders
+> Task :libuvccamera:compileDebugShaders NO-SOURCE
+> Task :libuvccamera:generateDebugAssets UP-TO-DATE
+> Task :app:processDebugManifestForPackage
+> Task :libuvccamera:mergeDebugAssets
+> Task :usbCameraCommon:mergeDebugShaders
+> Task :usbCameraCommon:compileDebugShaders NO-SOURCE
+> Task :usbCameraCommon:generateDebugAssets UP-TO-DATE
+> Task :usbCameraCommon:mergeDebugAssets
+> Task :app:mergeDebugAssets
+> Task :app:compressDebugAssets
+> Task :usbCameraCommon:bundleLibRuntimeToJarDebug
+> Task :libuvccamera:bundleLibRuntimeToJarDebug
+> Task :app:desugarDebugFileDependencies
+> Task :libuvccamera:processDebugJavaRes NO-SOURCE
+> Task :usbCameraCommon:processDebugJavaRes NO-SOURCE
+> Task :app:mergeDebugJniLibFolders
+> Task :usbCameraCommon:bundleLibRuntimeToDirDebug
+> Task :libuvccamera:bundleLibRuntimeToDirDebug
+> Task :app:checkDebugDuplicateClasses
+> Task :libuvccamera:mergeDebugJniLibFolders
+> Task :app:processDebugResources
+> Task :usbCameraCommon:mergeDebugJniLibFolders
+> Task :usbCameraCommon:mergeDebugNativeLibs NO-SOURCE
+> Task :app:mergeLibDexDebug
+> Task :libuvccamera:mergeDebugNativeLibs
+> Task :app:validateSigningDebug
+> Task :app:writeDebugAppMetadata
+> Task :usbCameraCommon:copyDebugJniLibsProjectOnly
+> Task :app:writeDebugSigningConfigVersions
+> Task :app:preReleaseBuild UP-TO-DATE
+> Task :app:mergeReleaseJniLibFolders
+> Task :libuvccamera:preReleaseBuild UP-TO-DATE
+> Task :libuvccamera:copyDebugJniLibsProjectOnly
+> Task :libuvccamera:mergeReleaseJniLibFolders
+> Task :usbCameraCommon:preReleaseBuild UP-TO-DATE
+> Task :app:mergeDebugNativeLibs
+> Task :usbCameraCommon:mergeReleaseJniLibFolders
+> Task :libuvccamera:mergeReleaseNativeLibs
+> Task :usbCameraCommon:mergeReleaseNativeLibs NO-SOURCE
+> Task :libuvccamera:generateReleaseResValues
+> Task :usbCameraCommon:copyReleaseJniLibsProjectOnly
+> Task :libuvccamera:generateReleaseResources
+> Task :libuvccamera:copyReleaseJniLibsProjectOnly
+> Task :libuvccamera:packageReleaseResources
+> Task :libuvccamera:processReleaseNavigationResources
+> Task :usbCameraCommon:generateReleaseResValues
+> Task :usbCameraCommon:generateReleaseResources
+> Task :usbCameraCommon:packageReleaseResources
+> Task :usbCameraCommon:processReleaseNavigationResources
+> Task :usbCameraCommon:javaPreCompileRelease
+> Task :libuvccamera:javaPreCompileRelease
+> Task :usbCameraCommon:parseReleaseLocalResources
+> Task :libuvccamera:parseReleaseLocalResources
+> Task :app:checkReleaseDuplicateClasses
+> Task :app:mergeReleaseNativeLibs
+
+> Task :app:stripDebugDebugSymbols
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.0.12077973] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.0.12077973] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.0.12077973] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.0.12077973] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.0.12077973] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.0.12077973] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.0.12077973] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.0.12077973] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+
+> Task :app:buildKotlinToolingMetadata
+> Task :usbCameraCommon:generateReleaseRFile
+> Task :libuvccamera:generateReleaseRFile
+> Task :app:dataBindingMergeDependencyArtifactsRelease
+
+> Task :app:stripReleaseDebugSymbols
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.0.12077973] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.0.12077973] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.0.12077973] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.0.12077973] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.0.12077973] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.0.12077973] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.0.12077973] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.0.12077973] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+
+> Task :libuvccamera:compileReleaseJavaWithJavac
+Java compiler version 21 has deprecated support for compiling with source/target version 8.
+Try one of the following options:
+    1. [Recommended] Use Java toolchain with a lower language version
+    2. Set a higher source/target version
+    3. Use a lower version of the JDK running the build (if you're not using Java toolchain)
+For more details on how to configure these settings, see https://developer.android.com/build/jdks.
+To suppress this warning, set android.javaCompile.suppressSourceTargetDeprecationWarning=true in gradle.properties.
+warning: [options] source value 8 is obsolete and will be removed in a future release
+warning: [options] target value 8 is obsolete and will be removed in a future release
+warning: [options] To suppress warnings about obsolete options, use -Xlint:-options.
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+3 warnings
+
+> Task :libuvccamera:bundleLibCompileToJarRelease
+> Task :app:generateReleaseResValues
+> Task :libuvccamera:bundleLibRuntimeToDirRelease
+
+> Task :app:extractReleaseNativeSymbolTables
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.0.12077973] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+
+> Task :usbCameraCommon:compileReleaseJavaWithJavac
+Java compiler version 21 has deprecated support for compiling with source/target version 8.
+Try one of the following options:
+    1. [Recommended] Use Java toolchain with a lower language version
+    2. Set a higher source/target version
+    3. Use a lower version of the JDK running the build (if you're not using Java toolchain)
+For more details on how to configure these settings, see https://developer.android.com/build/jdks.
+To suppress this warning, set android.javaCompile.suppressSourceTargetDeprecationWarning=true in gradle.properties.
+warning: [options] source value 8 is obsolete and will be removed in a future release
+warning: [options] target value 8 is obsolete and will be removed in a future release
+warning: [options] To suppress warnings about obsolete options, use -Xlint:-options.
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+3 warnings
+
+> Task :app:mergeReleaseNativeDebugMetadata NO-SOURCE
+> Task :app:generateReleaseResources
+> Task :usbCameraCommon:bundleLibRuntimeToDirRelease
+> Task :app:packageReleaseResources
+> Task :app:processReleaseNavigationResources
+> Task :app:parseReleaseLocalResources
+> Task :libuvccamera:writeReleaseAarMetadata
+> Task :usbCameraCommon:writeReleaseAarMetadata
+> Task :app:compileReleaseNavigationResources
+> Task :app:mapReleaseSourceSetPaths
+> Task :app:mergeExtDexDebug
+> Task :app:createReleaseCompatibleScreenManifests
+> Task :app:checkReleaseAarMetadata
+> Task :app:extractDeepLinksRelease
+> Task :libuvccamera:extractDeepLinksRelease
+> Task :usbCameraCommon:extractDeepLinksRelease
+
+> Task :libuvccamera:processReleaseManifest
+package="com.serenegiant.uvccamera" found in source AndroidManifest.xml: /home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main/AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="com.serenegiant.uvccamera" from the source AndroidManifest.xml: /home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main/AndroidManifest.xml.
+/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main/AndroidManifest.xml:29:5-31:41 Warning:
+	uses-sdk:minSdkVersion value (14) specified in the manifest file is ignored. It is overridden by the value declared in the DSL or the variant API, or 1 if not declared/present. Current value is (26).
+/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main/AndroidManifest.xml:29:5-31:41 Warning:
+	uses-sdk:targetSdkVersion value (22) specified in the manifest file is ignored. It is overridden by the value declared in the DSL or the variant API, or 1 if not declared/present. Current value is (34).
+
+> Task :libuvccamera:compileReleaseLibraryResources
+> Task :usbCameraCommon:compileReleaseLibraryResources
+
+> Task :usbCameraCommon:processReleaseManifest
+package="com.serenegiant.usbcameracommon" found in source AndroidManifest.xml: /home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/usbCameraCommon/src/main/AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="com.serenegiant.usbcameracommon" from the source AndroidManifest.xml: /home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/usbCameraCommon/src/main/AndroidManifest.xml.
+
+> Task :usbCameraCommon:bundleLibCompileToJarRelease
+> Task :app:javaPreCompileRelease
+> Task :app:processReleaseMainManifest
+> Task :app:processReleaseManifest
+> Task :app:desugarReleaseFileDependencies
+> Task :app:mergeReleaseStartupProfile
+> Task :app:mergeReleaseResources
+> Task :app:compileDebugKotlin
+> Task :app:compileDebugJavaWithJavac
+> Task :app:dexBuilderDebug
+> Task :app:processDebugJavaRes
+> Task :app:processReleaseManifestForPackage
+> Task :app:mergeDebugGlobalSynthetics
+> Task :app:dataBindingGenBaseClassesRelease
+> Task :libuvccamera:prepareReleaseArtProfile
+> Task :usbCameraCommon:prepareReleaseArtProfile
+> Task :app:mergeProjectDexDebug
+> Task :usbCameraCommon:bundleLibRuntimeToJarRelease
+> Task :app:mergeReleaseArtProfile
+> Task :libuvccamera:bundleLibRuntimeToJarRelease
+> Task :app:mergeReleaseShaders
+> Task :app:compileReleaseShaders NO-SOURCE
+> Task :app:generateReleaseAssets UP-TO-DATE
+> Task :libuvccamera:mergeReleaseShaders
+> Task :libuvccamera:compileReleaseShaders NO-SOURCE
+> Task :libuvccamera:generateReleaseAssets UP-TO-DATE
+> Task :libuvccamera:mergeReleaseAssets
+> Task :usbCameraCommon:mergeReleaseShaders
+> Task :usbCameraCommon:compileReleaseShaders NO-SOURCE
+> Task :usbCameraCommon:generateReleaseAssets UP-TO-DATE
+> Task :usbCameraCommon:mergeReleaseAssets
+> Task :app:mergeReleaseAssets
+> Task :app:compressReleaseAssets
+> Task :app:extractReleaseVersionControlInfo
+> Task :app:extractProguardFiles
+> Task :libuvccamera:processReleaseJavaRes NO-SOURCE
+> Task :libuvccamera:createFullJarRelease
+> Task :libuvccamera:extractProguardFiles
+> Task :app:mergeDebugJavaResource
+> Task :app:processReleaseResources
+> Task :app:mergeExtDexRelease
+> Task :libuvccamera:generateReleaseLintModel
+> Task :usbCameraCommon:processReleaseJavaRes NO-SOURCE
+> Task :libuvccamera:prepareLintJarForPublish
+> Task :usbCameraCommon:createFullJarRelease
+> Task :usbCameraCommon:extractProguardFiles
+> Task :usbCameraCommon:generateReleaseLintModel
+> Task :usbCameraCommon:prepareLintJarForPublish
+> Task :usbCameraCommon:stripReleaseDebugSymbols NO-SOURCE
+> Task :usbCameraCommon:checkReleaseAarMetadata
+> Task :usbCameraCommon:copyReleaseJniLibsProjectAndLocalJars
+> Task :usbCameraCommon:extractDeepLinksForAarRelease
+> Task :app:compileReleaseKotlin
+> Task :usbCameraCommon:extractReleaseAnnotations
+> Task :app:compileReleaseJavaWithJavac
+> Task :app:dexBuilderRelease
+> Task :app:mergeReleaseGlobalSynthetics
+> Task :app:packageDebug
+> Task :app:createDebugApkListingFileRedirect
+> Task :app:assembleDebug
+> Task :app:generateReleaseLintVitalReportModel
+> Task :usbCameraCommon:mergeReleaseGeneratedProguardFiles
+> Task :usbCameraCommon:mergeReleaseConsumerProguardFiles
+> Task :usbCameraCommon:mergeReleaseJavaResource
+> Task :libuvccamera:checkReleaseAarMetadata
+> Task :usbCameraCommon:syncReleaseLibJars
+> Task :usbCameraCommon:bundleReleaseLocalLintAar
+> Task :libuvccamera:extractDeepLinksForAarRelease
+
+> Task :libuvccamera:stripReleaseDebugSymbols
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.0.12077973] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.0.12077973] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.0.12077973] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.0.12077973] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.0.12077973] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.0.12077973] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.0.12077973] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.0.12077973] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+
+> Task :libuvccamera:extractReleaseAnnotations
+> Task :libuvccamera:mergeReleaseGeneratedProguardFiles
+> Task :libuvccamera:mergeReleaseConsumerProguardFiles
+> Task :libuvccamera:copyReleaseJniLibsProjectAndLocalJars
+> Task :libuvccamera:mergeReleaseJavaResource
+> Task :libuvccamera:syncReleaseLibJars
+> Task :libuvccamera:bundleReleaseLocalLintAar
+> Task :libuvccamera:writeReleaseLintModelMetadata
+> Task :usbCameraCommon:writeReleaseLintModelMetadata
+> Task :libuvccamera:generateReleaseLintVitalModel
+> Task :usbCameraCommon:generateReleaseLintVitalModel
+> Task :app:processReleaseJavaRes
+> Task :app:collectReleaseDependencies
+> Task :app:sdkReleaseDependencyData
+> Task :app:mergeReleaseJavaResource
+> Task :app:writeReleaseAppMetadata
+> Task :app:writeReleaseSigningConfigVersions
+> Task :libuvccamera:checkDebugAarMetadata
+> Task :libuvccamera:extractDebugAnnotations
+> Task :libuvccamera:extractDeepLinksForAarDebug
+> Task :libuvccamera:mergeDebugGeneratedProguardFiles
+> Task :libuvccamera:mergeDebugConsumerProguardFiles
+> Task :libuvccamera:prepareDebugArtProfile
+> Task :libuvccamera:mergeDebugJavaResource
+
+> Task :libuvccamera:stripDebugDebugSymbols
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.0.12077973] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.0.12077973] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.0.12077973] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.0.12077973] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.0.12077973] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.0.12077973] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.0.12077973] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.0.12077973] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+
+> Task :usbCameraCommon:checkDebugAarMetadata
+> Task :libuvccamera:syncDebugLibJars
+> Task :app:optimizeReleaseResources
+> Task :usbCameraCommon:stripDebugDebugSymbols NO-SOURCE
+> Task :libuvccamera:copyDebugJniLibsProjectAndLocalJars
+> Task :usbCameraCommon:copyDebugJniLibsProjectAndLocalJars
+> Task :libuvccamera:bundleDebugLocalLintAar
+> Task :usbCameraCommon:extractDebugAnnotations
+> Task :usbCameraCommon:extractDeepLinksForAarDebug
+> Task :usbCameraCommon:mergeDebugGeneratedProguardFiles
+> Task :usbCameraCommon:mergeDebugConsumerProguardFiles
+> Task :usbCameraCommon:prepareDebugArtProfile
+> Task :usbCameraCommon:mergeDebugJavaResource
+> Task :usbCameraCommon:syncDebugLibJars
+> Task :app:bundleDebugClassesToCompileJar
+> Task :usbCameraCommon:bundleDebugLocalLintAar
+> Task :app:preDebugAndroidTestBuild SKIPPED
+> Task :app:generateDebugAndroidTestResValues
+> Task :libuvccamera:createFullJarDebug
+> Task :libuvccamera:writeDebugLintModelMetadata
+> Task :usbCameraCommon:createFullJarDebug
+> Task :usbCameraCommon:writeDebugLintModelMetadata
+> Task :app:mergeDexRelease
+> Task :app:generateDebugAndroidTestLintModel
+> Task :libuvccamera:generateDebugLintModel
+> Task :usbCameraCommon:generateDebugLintModel
+> Task :app:generateDebugLintReportModel
+> Task :app:preDebugUnitTestBuild UP-TO-DATE
+> Task :app:generateDebugUnitTestLintModel
+> Task :libuvccamera:preDebugAndroidTestBuild UP-TO-DATE
+> Task :libuvccamera:generateDebugAndroidTestResValues
+> Task :libuvccamera:generateDebugAndroidTestLintModel
+> Task :libuvccamera:preDebugUnitTestBuild UP-TO-DATE
+> Task :libuvccamera:generateDebugUnitTestLintModel
+> Task :usbCameraCommon:preDebugAndroidTestBuild UP-TO-DATE
+> Task :usbCameraCommon:generateDebugAndroidTestResValues
+> Task :usbCameraCommon:generateDebugAndroidTestLintModel
+> Task :usbCameraCommon:preDebugUnitTestBuild UP-TO-DATE
+> Task :usbCameraCommon:generateDebugUnitTestLintModel
+> Task :app:bundleDebugClassesToRuntimeJar
+> Task :app:compileReleaseArtProfile
+> Task :app:compileDebugUnitTestKotlin NO-SOURCE
+> Task :app:javaPreCompileDebugUnitTest
+> Task :app:processDebugUnitTestJavaRes NO-SOURCE
+> Task :app:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :app:testDebugUnitTest NO-SOURCE
+> Task :app:preReleaseUnitTestBuild UP-TO-DATE
+> Task :app:bundleReleaseClassesToRuntimeJar
+> Task :app:javaPreCompileReleaseUnitTest
+> Task :app:bundleReleaseClassesToCompileJar
+> Task :libuvccamera:bundleDebugAar
+> Task :app:compileReleaseUnitTestKotlin NO-SOURCE
+> Task :app:compileReleaseUnitTestJavaWithJavac NO-SOURCE
+> Task :app:processReleaseUnitTestJavaRes NO-SOURCE
+> Task :app:testReleaseUnitTest NO-SOURCE
+> Task :app:test UP-TO-DATE
+> Task :libuvccamera:assembleDebug
+> Task :libuvccamera:bundleReleaseAar
+> Task :libuvccamera:mapReleaseSourceSetPaths
+> Task :libuvccamera:mergeReleaseResources
+> Task :libuvccamera:generateDebugLintReportModel
+> Task :libuvccamera:processDebugUnitTestJavaRes NO-SOURCE
+> Task :libuvccamera:preReleaseUnitTestBuild UP-TO-DATE
+> Task :libuvccamera:javaPreCompileDebugUnitTest
+> Task :libuvccamera:processReleaseUnitTestJavaRes NO-SOURCE
+> Task :usbCameraCommon:bundleDebugAar
+> Task :usbCameraCommon:assembleDebug
+> Task :usbCameraCommon:bundleReleaseAar
+> Task :usbCameraCommon:mapReleaseSourceSetPaths
+> Task :libuvccamera:generateReleaseUnitTestStubRFile
+> Task :libuvccamera:generateDebugUnitTestStubRFile
+> Task :libuvccamera:javaPreCompileReleaseUnitTest
+> Task :libuvccamera:verifyReleaseResources
+> Task :usbCameraCommon:mergeReleaseResources
+> Task :libuvccamera:assembleRelease
+> Task :libuvccamera:assemble
+> Task :libuvccamera:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :libuvccamera:testDebugUnitTest NO-SOURCE
+> Task :libuvccamera:compileReleaseUnitTestJavaWithJavac NO-SOURCE
+> Task :libuvccamera:testReleaseUnitTest NO-SOURCE
+> Task :libuvccamera:test UP-TO-DATE
+> Task :usbCameraCommon:generateDebugLintReportModel
+> Task :usbCameraCommon:processDebugUnitTestJavaRes NO-SOURCE
+> Task :usbCameraCommon:preReleaseUnitTestBuild UP-TO-DATE
+> Task :usbCameraCommon:javaPreCompileReleaseUnitTest
+> Task :usbCameraCommon:generateDebugUnitTestStubRFile
+> Task :usbCameraCommon:processReleaseUnitTestJavaRes NO-SOURCE
+> Task :usbCameraCommon:javaPreCompileDebugUnitTest
+> Task :usbCameraCommon:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :usbCameraCommon:testDebugUnitTest NO-SOURCE
+> Task :usbCameraCommon:generateReleaseUnitTestStubRFile
+> Task :usbCameraCommon:compileReleaseUnitTestJavaWithJavac NO-SOURCE
+> Task :usbCameraCommon:testReleaseUnitTest NO-SOURCE
+> Task :usbCameraCommon:test UP-TO-DATE
+> Task :usbCameraCommon:verifyReleaseResources
+> Task :usbCameraCommon:assembleRelease
+> Task :usbCameraCommon:assemble
+> Task :libuvccamera:lintVitalAnalyzeRelease
+> Task :app:lintAnalyzeDebugAndroidTest
+> Task :app:lintAnalyzeDebugUnitTest
+> Task :libuvccamera:lintAnalyzeDebugAndroidTest
+> Task :libuvccamera:lintAnalyzeDebugUnitTest
+> Task :usbCameraCommon:lintAnalyzeDebugAndroidTest
+> Task :usbCameraCommon:lintAnalyzeDebugUnitTest
+> Task :usbCameraCommon:lintVitalAnalyzeRelease
+> Task :libuvccamera:lintAnalyzeDebug
+
+> Task :libuvccamera:lintReportDebug
+Wrote HTML report to file:///home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/build/reports/lint-results-debug.html
+Lint found 4 errors and 16 warnings. First failure:
+/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main/java/com/serenegiant/usb/UVCCamera.java:344: Error: Suspicious indentation: This is conditionally executed; expected it to be indented [SuspiciousIndentation]
+  try {
+  ~~~~~
+    /home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main/java/com/serenegiant/usb/UVCCamera.java:343: Previous statement here
+
+
+> Task :libuvccamera:lintDebug FAILED
+Lint found 4 errors, 16 warnings. First failure:
+
+/home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main/java/com/serenegiant/usb/UVCCamera.java:344: Error: Suspicious indentation: This is conditionally executed; expected it to be indented [SuspiciousIndentation]
+  try {
+  ~~~~~
+    /home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main/java/com/serenegiant/usb/UVCCamera.java:343: Previous statement here
+
+The full lint text report is located at:
+  /home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/build/intermediates/lint_intermediate_text_report/debug/lintReportDebug/lint-results-debug.txt
+
+> Task :app:lintVitalAnalyzeRelease
+> Task :usbCameraCommon:lintAnalyzeDebug
+
+[Incubating] Problems report is available at: file:///home/bluekitty/Documents/Git/viture-utilities/android-app/VitureHUD/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':libuvccamera:lintDebug'.
+> Lint found errors in the project; aborting build.
+  
+  Fix the issues identified by lint, or create a baseline to see only new errors.
+  To create a baseline, run `gradlew updateLintBaseline` after adding the following to the module's build.gradle file:
+  ```
+  android {
+      lint {
+          baseline = file("lint-baseline.xml")
+      }
+  }
+  ```
+  For more details, see https://developer.android.com/studio/write/lint#snapshot
+  
+  Lint found 4 errors, 16 warnings. First failure:
+  
+  /home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main/java/com/serenegiant/usb/UVCCamera.java:344: Error: Suspicious indentation: This is conditionally executed; expected it to be indented [SuspiciousIndentation]
+    try {
+    ~~~~~
+      /home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/src/main/java/com/serenegiant/usb/UVCCamera.java:343: Previous statement here
+  
+  The full lint text report is located at:
+    /home/bluekitty/Documents/Git/viture-utilities/android-app/UVCCamera/libuvccamera/build/intermediates/lint_intermediate_text_report/debug/lintReportDebug/lint-results-debug.txt
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.13/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 1m 29s
+280 actionable tasks: 280 executed

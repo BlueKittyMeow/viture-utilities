@@ -7,6 +7,7 @@
 
     <!-- Camera permission (Android 13+ requires this even for USB cameras) -->
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
 
     <!-- Notifications (required by UVCCamera library for Android 13+) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
