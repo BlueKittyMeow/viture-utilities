@@ -12,6 +12,7 @@ import com.serenegiant.usb.UVCCamera
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
+import kotlin.math.min
 
 /**
  * Helper class to manage Viture camera connection and capture.
@@ -43,6 +44,13 @@ class VitureCamera(private val context: Context) {
         private const val CAMERA_HEIGHT = 1080
         private const val CAMERA_FPS_MIN = 1
         private const val CAMERA_FPS_MAX = 5
+
+        /**
+         * Convert byte array to hex string for debugging
+         */
+        private fun ByteArray.toHexString(): String {
+            return joinToString(" ") { byte -> "%02X".format(byte) }
+        }
     }
 
     // USB monitoring and camera objects (UVC approach)
@@ -200,34 +208,102 @@ class VitureCamera(private val context: Context) {
                 }
             }
 
-            // Try to configure preview - use MJPEG format first
+            // PHASE 1 TEST: Try direct streaming without format negotiation
+            // Hypothesis: Camera might work with default format, no setPreviewSize() needed
+            Log.d(TAG, "=== PHASE 1: Attempting direct streaming without format negotiation ===")
+
+            var directStreamingSuccess = false
+            var frameCount = 0
+            val maxTestFrames = 5  // Capture up to 5 frames for testing
+
             try {
-                // Try 1920x1080 MJPEG
-                uvcCamera?.setPreviewSize(
-                    CAMERA_WIDTH,
-                    CAMERA_HEIGHT,
-                    CAMERA_FPS_MIN,
-                    CAMERA_FPS_MAX,
-                    UVCCamera.FRAME_FORMAT_MJPEG,
-                    UVCCamera.DEFAULT_BANDWIDTH
-                )
-                Log.d(TAG, "Preview configured: ${CAMERA_WIDTH}x${CAMERA_HEIGHT} MJPEG")
+                // Set frame callback to capture any incoming data
+                uvcCamera?.setFrameCallback({ frame ->
+                    frameCount++
+                    val size = frame.remaining()
+
+                    // Capture first 16 bytes for analysis
+                    val headerSize = min(16, size)
+                    val header = ByteArray(headerSize)
+                    frame.get(header)
+                    frame.rewind()  // Reset position for other uses
+
+                    Log.d(TAG, "PHASE 1 FRAME #$frameCount: size=${size} bytes, header=${header.toHexString()}")
+
+                    // Check for MJPEG signature (FF D8 FF)
+                    if (size > 3 && header[0] == 0xFF.toByte() && header[1] == 0xD8.toByte() && header[2] == 0xFF.toByte()) {
+                        Log.d(TAG, "  ✅ MJPEG frame detected! (FF D8 FF signature)")
+                    }
+
+                    // Check for YUYV pattern (alternating luma/chroma)
+                    if (size >= 4) {
+                        Log.d(TAG, "  First 4 bytes (potential YUYV): Y=${header[0].toInt() and 0xFF} Cb=${header[1].toInt() and 0xFF} Y=${header[2].toInt() and 0xFF} Cr=${header[3].toInt() and 0xFF}")
+                    }
+
+                    // Stop capturing after test frames
+                    if (frameCount >= maxTestFrames) {
+                        Log.d(TAG, "PHASE 1: Captured $maxTestFrames test frames, stopping callback")
+                        uvcCamera?.setFrameCallback(null, UVCCamera.PIXEL_FORMAT_RAW)
+                    }
+
+                }, UVCCamera.PIXEL_FORMAT_RAW)
+
+                Log.d(TAG, "PHASE 1: Frame callback set, attempting to start preview...")
+
+                // Try to start preview without calling setPreviewSize()
+                // This might work if camera auto-negotiates format
+                uvcCamera?.startPreview()
+
+                // Wait a moment to see if frames arrive
+                Thread.sleep(1000)
+
+                if (frameCount > 0) {
+                    directStreamingSuccess = true
+                    Log.d(TAG, "✅ PHASE 1 SUCCESS! Camera streaming without format negotiation!")
+                    Log.d(TAG, "   Received $frameCount frames in test period")
+                } else {
+                    Log.w(TAG, "❌ PHASE 1 FAILED: No frames received after startPreview()")
+                }
+
             } catch (e: Exception) {
-                Log.w(TAG, "Failed to set 1920x1080 MJPEG, trying YUYV: ${e.message}")
+                Log.w(TAG, "❌ PHASE 1 FAILED: Exception during direct streaming test: ${e.message}")
+                directStreamingSuccess = false
+            }
+
+            // If Phase 1 failed, try traditional format negotiation
+            if (!directStreamingSuccess) {
+                Log.d(TAG, "=== Falling back to traditional format negotiation ===")
+
                 try {
-                    // Try 1920x1080 YUYV
+                    // Try 1920x1080 MJPEG
                     uvcCamera?.setPreviewSize(
                         CAMERA_WIDTH,
                         CAMERA_HEIGHT,
                         CAMERA_FPS_MIN,
                         CAMERA_FPS_MAX,
-                        UVCCamera.FRAME_FORMAT_YUYV,
+                        UVCCamera.FRAME_FORMAT_MJPEG,
                         UVCCamera.DEFAULT_BANDWIDTH
                     )
-                    Log.d(TAG, "Preview configured: ${CAMERA_WIDTH}x${CAMERA_HEIGHT} YUYV")
-                } catch (e2: Exception) {
-                    Log.e(TAG, "Failed to set any preview format, throwing exception")
-                    throw e2
+                    Log.d(TAG, "Preview configured: ${CAMERA_WIDTH}x${CAMERA_HEIGHT} MJPEG")
+                } catch (e: Exception) {
+                    Log.w(TAG, "Failed to set 1920x1080 MJPEG, trying YUYV: ${e.message}")
+                    try {
+                        // Try 1920x1080 YUYV
+                        uvcCamera?.setPreviewSize(
+                            CAMERA_WIDTH,
+                            CAMERA_HEIGHT,
+                            CAMERA_FPS_MIN,
+                            CAMERA_FPS_MAX,
+                            UVCCamera.FRAME_FORMAT_YUYV,
+                            UVCCamera.DEFAULT_BANDWIDTH
+                        )
+                        Log.d(TAG, "Preview configured: ${CAMERA_WIDTH}x${CAMERA_HEIGHT} YUYV")
+                    } catch (e2: Exception) {
+                        Log.e(TAG, "Failed to set any preview format")
+                        Log.e(TAG, "=== PHASE 1 RESULT: Direct streaming did not work ===")
+                        Log.e(TAG, "=== NEXT STEP: Proceed to Phase 2 (USB traffic sniffing) ===")
+                        throw e2
+                    }
                 }
             }
 

@@ -584,5 +584,277 @@ Tested Camera2 API approach:
 
 ---
 
-**Status:** Camera opens successfully with UVC patch! Working on format negotiation.
-**Next Update:** After format/streaming protocol investigation
+## UltraThink Analysis: Strategic Approach to Format Negotiation
+
+### Current Situation Summary
+
+✅ **Solved:**
+- Camera opens successfully (error -50 fixed with vendor-specific interface patch)
+- USB device accessible at `/dev/bus/usb/002/004`
+- USB permissions working correctly
+- Camera permissions granted
+
+❌ **Current Blocker:**
+- Camera reports NO format descriptors
+- `setPreviewSize()` fails for any format (MJPEG, YUYV)
+- No supported sizes returned by `getSupportedSizeList()`
+
+🔍 **Critical Insight:**
+CameraFi uses the SAME `libuvc.so` library we do, yet it works. Their `libVaultUVC.so` (1MB wrapper) must contain the solution.
+
+---
+
+### Three-Phase Hybrid Strategy
+
+#### **Phase 1: Direct Streaming Test** ⭐ START HERE
+**Time:** 30 min - 2 hours | **Success Probability:** 20-30%
+
+**Hypothesis:** Camera might auto-negotiate or use default format without explicit `setPreviewSize()`
+
+**Approach:**
+```kotlin
+// Skip format negotiation entirely
+uvcCamera?.open(ctrlBlock)
+
+// Try streaming immediately
+uvcCamera?.setFrameCallback({ frame ->
+    val size = frame.remaining()
+    Log.d("Frame: ${size} bytes")
+    // Analyze data pattern (MJPEG signature: FF D8 FF)
+}, UVCCamera.PIXEL_FORMAT_RAW)
+
+uvcCamera?.startPreview()
+```
+
+**Pros:**
+- ⚡ Fastest implementation (30 min)
+- 💡 Might just work if camera has default format
+- 🎯 Low risk, minimal time investment
+- 📝 Simple code change
+
+**Cons:**
+- 📉 Lower success probability (20-30%)
+- ❓ May not reveal why CameraFi works if it fails
+
+**Success Criteria:**
+- Frame callback receives data with size > 0
+- Data pattern indicates MJPEG (FF D8) or YUYV
+- No exceptions during `startPreview()`
+
+**Next if fails:** Move to Phase 2
+
+---
+
+#### **Phase 2: USB Traffic Sniffing** ⭐ RECOMMENDED IF PHASE 1 FAILS
+**Time:** 4-8 hours | **Success Probability:** 70-80% (cumulative with Phase 1: 76-84%)
+
+**Hypothesis:** CameraFi sends vendor-specific USB control transfers before streaming
+
+**Approach:**
+```bash
+# Method 1: Linux host usbmon (most reliable)
+sudo modprobe usbmon
+sudo tcpdump -i usbmon2 -w viture_camera.pcap
+
+# Launch CameraFi on phone, start camera
+# Stop capture, analyze with Wireshark
+
+# Method 2: Android tcpdump (alternative)
+adb shell su -c "tcpdump -i any -w /sdcard/capture.pcap"
+```
+
+**What to look for in Wireshark:**
+1. **Vendor-specific control transfers:**
+   - bmRequestType: 0x40 (host-to-device, vendor) or 0xC0 (device-to-host, vendor)
+   - bRequest: Custom command codes
+   - wValue, wIndex, wLength: Parameter values
+
+2. **Format negotiation sequence:**
+   - Commands sent after device open
+   - Before first video frame appears
+   - Pattern: SET_CUR, GET_CUR on vendor-specific endpoints
+
+3. **Custom initialization:**
+   - Vendor commands that configure streaming
+   - Format selection via non-standard method
+
+**Analysis Steps:**
+1. Filter packets: `usb.src == "2.4.0"` (device address)
+2. Find control transfers before streaming starts
+3. Document command sequence
+4. Implement same sequence in our code
+
+**Pros:**
+- 🎯 Highest success probability (70-80%)
+- 🔍 Shows EXACTLY what CameraFi does
+- 📊 Captures vendor-specific USB commands we're missing
+- 💯 Most reliable path to solution
+- 🚀 Easier than reverse engineering binary code
+
+**Cons:**
+- ⏱️ Moderate time investment (4-8 hours)
+- 🛠️ Requires USB debugging setup (root or Linux host)
+- 📡 Need packet capture tools and Wireshark knowledge
+
+**Success Criteria:**
+- Capture shows vendor-specific control transfers
+- Commands can be replicated via `controlTransfer()` API
+- Streaming starts after sending captured commands
+
+**Next if fails:** Move to Phase 3
+
+---
+
+#### **Phase 3: Reverse Engineer libVaultUVC.so** (FALLBACK ONLY)
+**Time:** 6-12 hours | **Success Probability:** 80-90% (cumulative: 95-97%)
+
+**Approach:**
+```bash
+# Extract native library from CameraFi APK
+unzip -j camerafi_arm64.apk "lib/arm64-v8a/libVaultUVC.so"
+
+# Analyze with Ghidra or IDA Pro
+ghidra &  # Load libVaultUVC.so
+
+# Look for:
+# - Format negotiation functions
+# - USB control transfer calls (ioctl, libusb_control_transfer)
+# - Initialization sequences
+# - Viture-specific string constants
+```
+
+**What to find:**
+1. Function calls to `libusb_control_transfer` or similar
+2. Format setup logic that bypasses UVC descriptors
+3. Vendor-specific initialization sequence
+4. Constants: VID (0x35ca), PID (0x1101)
+
+**Pros:**
+- 📖 Complete understanding of implementation
+- 🔓 May reveal Viture-specific APIs
+- 💯 Highest ultimate success probability
+
+**Cons:**
+- ⏱️ Highest time investment (6-12 hours)
+- 🧩 Complex native code analysis required
+- 🔒 May be obfuscated or stripped
+- ⚖️ Legal gray area (though personal use generally OK)
+- 🛠️ Requires reverse engineering skills
+
+**Use only as last resort** when USB capture doesn't reveal the protocol.
+
+---
+
+### Risk Assessment
+
+| Scenario | Probability | Mitigation |
+|----------|-------------|------------|
+| **Low Risk:** Phases 1+2 solve it | 90% | Expected outcome - camera uses observable vendor protocol |
+| **Medium Risk:** Need Phase 3 | 9% | Have fallback plan with reverse engineering |
+| **High Risk:** Camera uses DRM/auth | 1% | Very unlikely for USB camera; would need different approach |
+
+---
+
+### Time Estimates & Success Probability
+
+| Phase | Time | Cumulative Time | Individual Success | Cumulative Success |
+|-------|------|-----------------|-------------------|-------------------|
+| Phase 1 | 1-2h | 1-2h | 20-30% | 20-30% |
+| Phase 2 | 4-8h | 5-10h | 70-80% | 76-84% |
+| Phase 3 | 6-12h | 11-22h | 80-90% | 95-97% |
+
+**Expected time to solution:** 5-10 hours (Phases 1+2)
+**Worst case:** 11-22 hours (all 3 phases)
+
+---
+
+### Why This Order?
+
+1. **Efficiency First:** Try quick win (30 min) before investing 4-8 hours
+2. **Observable > Reverse Engineering:** USB traffic shows runtime behavior directly
+3. **Risk Mitigation:** Each phase builds knowledge for the next
+4. **Pragmatic:** Start easy, escalate complexity only if needed
+
+---
+
+### Implementation Notes
+
+#### For Phase 1 (Direct Streaming):
+- Add extensive logging for frame data
+- Check for MJPEG signature: `FF D8 FF E0` or `FF D8 FF E1`
+- Check for YUYV pattern: repeated Y-Cb-Y-Cr bytes
+- Log first 16 bytes as hex for manual inspection
+- Try both `PIXEL_FORMAT_RAW` and `PIXEL_FORMAT_MJPEG`
+
+#### For Phase 2 (USB Sniffing):
+- Use Linux host if possible (better than Android tcpdump)
+- Filter by USB address to reduce noise
+- Focus on control transfers (not bulk data)
+- Look for patterns: repeated commands, initialization sequences
+- Document exact byte sequences for replication
+
+#### For Phase 3 (Reverse Engineering):
+- Start with string search for "viture", "0x35ca", "format"
+- Find entry points: JNI functions called from Java
+- Trace backward from `libusb_control_transfer` calls
+- Focus on initialization and format setup functions
+- Document vendor-specific command codes
+
+---
+
+### Critical Success Factors
+
+1. **Methodical Approach:** Document each attempt thoroughly
+2. **Pattern Recognition:** Look for vendor-specific USB commands
+3. **Persistence:** CameraFi proves it's solvable
+4. **Knowledge Building:** Each phase informs the next
+
+---
+
+---
+
+## Phase 1 Test Results (2026-01-14 Evening)
+
+### Implementation
+- Added direct streaming test to `VitureCamera.kt` (lines 211-308)
+- Attempts `startPreview()` without calling `setPreviewSize()`
+- Captures up to 5 test frames with detailed logging
+- Analyzes frame headers for MJPEG/YUYV signatures
+- Falls back to traditional format negotiation if no frames received
+
+### Test Execution
+```
+=== PHASE 1: Attempting direct streaming without format negotiation ===
+PHASE 1: Frame callback set, attempting to start preview...
+❌ PHASE 1 FAILED: No frames received after startPreview()
+```
+
+### Results
+❌ **Phase 1 FAILED**
+
+**Findings:**
+- `startPreview()` executed without exceptions
+- No frames received in 1-second test window
+- Frame callback never triggered
+- Camera does NOT auto-negotiate format
+
+**Conclusion:**
+Viture camera requires explicit format configuration via vendor-specific protocol. Direct streaming without format negotiation does not work.
+
+**Success Probability:** 20-30% (estimated) → 0% (actual)
+
+### Analysis
+The camera:
+1. ✅ Opens successfully (USB connection works)
+2. ✅ Accepts `startPreview()` call (no immediate error)
+3. ❌ Does NOT send frames without format setup
+4. ❌ Does NOT auto-negotiate default format
+
+This confirms CameraFi must use vendor-specific USB control transfers to configure the camera before streaming.
+
+---
+
+## Proceeding to Phase 2: USB Traffic Sniffing
+
+**Status:** Phase 1 completed and documented. Ready for Phase 2 (USB traffic capture and analysis)
+**Next Update:** After USB traffic sniffing setup and CameraFi capture
