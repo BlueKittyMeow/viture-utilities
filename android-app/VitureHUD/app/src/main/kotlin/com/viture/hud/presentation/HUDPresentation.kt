@@ -2,6 +2,7 @@ package com.viture.hud.presentation
 
 import android.app.Presentation
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.Display
@@ -9,6 +10,9 @@ import android.view.Surface
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
+import android.view.Window
+import android.view.WindowInsets
+import android.view.WindowInsetsController
 import android.view.WindowManager
 import android.widget.FrameLayout
 import android.widget.ScrollView
@@ -55,16 +59,24 @@ class HUDPresentation(
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Request no title BEFORE super.onCreate - critical for fullscreen
+        requestWindowFeature(Window.FEATURE_NO_TITLE)
+
         super.onCreate(savedInstanceState)
 
-        // Make presentation fullscreen on glasses
+        // Configure window for true fullscreen (including DeX taskbar area)
         window?.apply {
-            setFlags(
-                WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN
-            )
             // Keep screen on while HUD is active
             addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
+            // Fullscreen flags for DeX - these can be set before setContentView
+            setFlags(
+                WindowManager.LayoutParams.FLAG_FULLSCREEN or
+                    WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN or
+                    WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
+            )
+            // Note: insetsController setup happens in applyImmersiveMode() AFTER setContentView
         }
 
         setContentView(R.layout.layout_hud_presentation)
@@ -74,10 +86,47 @@ class HUDPresentation(
         textContainer = findViewById(R.id.textContainer)
         textDisplay = findViewById(R.id.hudTextDisplay)
 
+        // Apply immersive fullscreen AFTER setContentView (decorView needs to exist)
+        applyImmersiveMode()
+
         // Start in text mode by default
         showTextMode()
 
         Log.d(TAG, "HUD Presentation created on display: ${display.name}")
+    }
+
+    override fun onStart() {
+        super.onStart()
+        // Re-apply immersive mode in case system reset it
+        applyImmersiveMode()
+    }
+
+    /**
+     * Apply immersive fullscreen mode to hide system bars.
+     * Must be called AFTER setContentView.
+     */
+    private fun applyImmersiveMode() {
+        window?.decorView?.let { decorView ->
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                // Android 11+ (API 30+)
+                window?.setDecorFitsSystemWindows(false)
+                decorView.windowInsetsController?.let { controller ->
+                    controller.hide(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
+                    controller.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                }
+            } else {
+                // Android 10 and below
+                @Suppress("DEPRECATION")
+                decorView.systemUiVisibility = (
+                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                    or View.SYSTEM_UI_FLAG_FULLSCREEN
+                    or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                )
+            }
+        }
     }
 
     /**
