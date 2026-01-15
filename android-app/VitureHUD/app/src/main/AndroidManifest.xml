@@ -5,6 +5,12 @@
     <uses-permission android:name="android.permission.USB_HOST" />
     <uses-feature android:name="android.hardware.usb.host" />
 
+    <!-- Camera permission (Android 13+ requires this even for USB cameras) -->
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <!-- Notifications (required by UVCCamera library for Android 13+) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <!-- Storage for saving captures and notes -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />

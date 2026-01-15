@@ -45,9 +45,14 @@ dependencies {
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
 
-    // USB Camera library - TEMPORARILY DISABLED to get app building
-    // We'll add this back once we find a working version
-    // implementation("com.jiangdg.usbcamera:libusbcamera:2.5.3")
+    // UVC Camera modules (local build from cloned repository)
+    implementation(project(":libuvccamera"))
+    implementation(project(":usbCameraCommon"))
+
+    // Required dependency for UVCCamera
+    implementation("com.serenegiant:common:1.5.20") {
+        exclude(module = "support-v4")
+    }
 
     // Coroutines for async operations
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
