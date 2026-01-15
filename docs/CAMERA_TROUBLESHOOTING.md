@@ -856,5 +856,207 @@ This confirms CameraFi must use vendor-specific USB control transfers to configu
 
 ## Proceeding to Phase 2: USB Traffic Sniffing
 
-**Status:** Phase 1 completed and documented. Ready for Phase 2 (USB traffic capture and analysis)
-**Next Update:** After USB traffic sniffing setup and CameraFi capture
+---
+
+## Phase 2: Library Analysis (2026-01-14 Evening)
+
+### Initial Approach: USB Traffic Sniffing
+
+**Attempt 1: Linux Host USB Monitoring**
+- Phone connected via wireless ADB (TCP/IP)
+- Viture camera connects to PHONE via USB (not to PC)
+- Cannot capture USB traffic on PC side
+
+**Attempt 2: Android USB Monitoring**
+```bash
+adb shell su -c "tcpdump"  # FAILED: No root access
+ls /sys/kernel/debug/usb/usbmon  # FAILED: No usbmon access
+```
+
+**Result:** Phone not rooted, no USB monitoring access on Android
+
+### Alternative Approach: Direct Library Analysis
+
+Instead of USB capture, analyzed CameraFi's native libraries directly.
+
+#### Libraries Extracted
+
+From CameraFi APK (`camerafi_arm64.apk`):
+
+| Library | Size | Purpose |
+|---------|------|---------|
+| `libuvc.so` | 291 KB | UVC protocol implementation (same family as we use) |
+| `libusb.so` | 112 KB | USB communication layer |
+| `libvuac_camerafi.so` | 343 KB | VUAC wrapper (mostly audio processing) |
+| **`libVaultUVC.so`** | **985 KB** | **Main camera handling** ⭐ |
+
+#### Key Discoveries
+
+**1. Viture Vendor ID Found in libVaultUVC.so**
+
+```bash
+hexdump -C libVaultUVC.so | grep "ca 35"
+00007c80  ca 35 00 00 12 00 00 00  00 00 00 00 00 00 00 00  |.5..............|
+```
+
+- Viture VID `0x35ca` (13770 decimal) found at offset `0x7c80`
+- Located in what appears to be a device table/array
+- Confirms libVaultUVC has Viture-specific code
+
+**2. Library Functions**
+
+From `nm -D libVaultUVC.so`:
+```
+VuacInit               - Initialize VUAC context
+VuacOpen               - Open camera device
+VuacDeInit             - Cleanup
+uvc_get_stream_ctrl_format_size   - Format negotiation
+uvc_get_stream_ctrl_format_size1  - Alternative format function
+```
+
+**3. UVC Functions Present**
+
+Standard UVC functions are available:
+- `uvc_init2`, `uvc_init2n` - Initialization
+- `uvc_get_frame_desc` - Frame descriptor parsing
+- `uvc_get_format_descs` - Format descriptor parsing
+- `uvc_parse_vs_format_mjpeg` - MJPEG format parsing
+- `uvc_parse_vs_format_uncompressed` - YUYV format parsing
+- `uvc_get_ae_mode`, `uvc_get_brightness`, etc. - Camera controls
+
+**4. Audio Processing in libvuac_camerafi.so**
+
+Strings found:
+```
+speex_resampler_init
+speex_echo_state_init
+speex_preprocess_state_init
+InitDevice
+InitDescriptors
+USB_AUDIO_FORMAT_TYPE_DESCRIPTOR
+```
+
+Primary focus is **audio ADC** (microphone), not video format negotiation.
+
+**5. CameraFi's libuvc.so Analysis**
+
+Strings indicate standard UVC format handling:
+```
+uvc_get_stream_ctrl_format_size_fps
+oasess - req UVC_FRAME_FORMAT_YUYV
+oasess - req UVC_FRAME_FORMAT_MJPEG
+Format(Uncompressed,0x04)  # YUYV
+Format(MJPEG,0x06)         # MJPEG
+```
+
+### Analysis Results
+
+**What CameraFi Uses:**
+- Same UVC library family as our implementation
+- Standard UVC format codes: MJPEG (0x06), YUYV (0x04)
+- Viture VID hardcoded in libVaultUVC.so
+
+**Limitations Encountered:**
+- ❌ Libraries are **stripped** (no debug symbols)
+- ❌ Full reverse engineering requires Ghidra/IDA Pro (6-12 hour effort)
+- ❌ No root access for USB traffic capture
+- ❌ Complex native code analysis without specialized tools
+
+**Key Insight:**
+CameraFi likely uses **standard UVC probe/commit sequence** with hardcoded format values, despite camera not advertising formats in descriptors.
+
+---
+
+## Phase 2.5: Proposed Manual Stream Control (Next Step)
+
+### Hypothesis
+The Viture camera might accept standard UVC probe/commit commands with explicit format values, even though `getSupportedSizeList()` returns empty.
+
+### Approach: Direct UVC Stream Control
+
+Bypass UVCCamera's `setPreviewSize()` and manually configure streaming:
+
+**Implementation Strategy:**
+```kotlin
+// Instead of: uvcCamera.setPreviewSize(...)
+
+// 1. Create stream control block manually
+val streamCtrl = UVC_STREAM_CTRL_BLOCK()
+streamCtrl.formatIndex = 1  // First format (try MJPEG)
+streamCtrl.frameIndex = 1   // First frame size
+streamCtrl.dwFrameInterval = 333333  // 30 FPS (or 200000 for 5 FPS)
+streamCtrl.dwMaxVideoFrameSize = 1920 * 1080 * 2  // Buffer size
+
+// 2. Send PROBE control transfer
+uvcCamera.sendProbeControl(streamCtrl)
+
+// 3. Send COMMIT control transfer
+uvcCamera.sendCommitControl(streamCtrl)
+
+// 4. Start streaming
+uvcCamera.startPreview()
+```
+
+**UVC Probe/Commit Protocol:**
+- **SET_CUR(PROBE)**: Negotiate format parameters
+- **GET_CUR(PROBE)**: Camera returns adjusted parameters
+- **SET_CUR(COMMIT)**: Commit to negotiated format
+- **Start streaming**
+
+### Format Values to Try
+
+| Parameter | MJPEG Try 1 | YUYV Try 2 | Notes |
+|-----------|-------------|------------|-------|
+| Format Code | 0x06 | 0x04 | MJPEG vs Uncompressed |
+| Format Index | 1 | 1 | First format |
+| Frame Index | 1 | 1 | First resolution |
+| Width | 1920 | 1920 | From spec |
+| Height | 1080 | 1080 | From spec |
+| FPS | 30 or 5 | 30 or 5 | Try both |
+| Frame Interval | 333333 (30fps) | 333333 (30fps) | 100ns units |
+
+### Success Criteria
+- ✅ Probe/commit succeed without errors
+- ✅ `startPreview()` begins streaming
+- ✅ Frame callback receives data
+- ✅ Data has MJPEG signature (FF D8 FF) or valid YUYV pattern
+
+### Time Estimate
+**30-60 minutes** - Quick test before full reverse engineering
+
+### Why This Might Work
+1. CameraFi uses standard UVC functions (`uvc_get_stream_ctrl_format_size`)
+2. Viture camera responds to standard UVC probe/commit (just doesn't advertise formats)
+3. We can hardcode the parameters CameraFi must be using
+4. Much faster than 6-12 hour reverse engineering effort
+
+---
+
+## Decision Point
+
+**Three Options:**
+
+**Option A: Manual Probe/Commit Test** ⭐ RECOMMENDED
+- Time: 30-60 minutes
+- Success probability: 30-40%
+- Implements direct UVC stream control
+- Quick test before heavy lifting
+
+**Option B: Full Reverse Engineering**
+- Time: 6-12 hours
+- Success probability: 80-90%
+- Requires Ghidra/IDA Pro setup
+- Deep dive into libVaultUVC.so
+
+**Option C: USB Sniffing Alternative**
+- Time: 2-4 hours
+- Success probability: 50-60%
+- Requires connecting phone via USB cable to Linux host
+- May still face rooting/permission issues
+
+**Recommendation:** Try Option A first (30-60 min quick test), fall back to Option B if needed.
+
+---
+
+**Status:** Phase 2 library analysis complete. Identified key libraries and Viture VID. Ready for Phase 2.5 (manual probe/commit test).
+**Next Update:** After manual stream control implementation and testing
