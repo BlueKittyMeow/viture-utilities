@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Filter for Viture camera device (vendor 0x35ca, product 0x1101) -->
-    <usb-device vendor-id="13770" product-id="4353" />
-    <!-- vendor-id: 0x35ca = 13770 decimal -->
-    <!-- product-id: 0x1101 = 4353 decimal -->
+    <!-- Filter for Sonix UVC camera inside Viture glasses (0c45:636b) -->
+    <usb-device vendor-id="3141" product-id="25451" />
+    <!-- vendor-id: 0x0c45 = 3141 decimal (Sonix camera chip) -->
+    <!-- product-id: 0x636b = 25451 decimal -->
+
+    <!-- Note: The Viture control interface (35ca:1101) is NOT the camera -->
 </resources>
