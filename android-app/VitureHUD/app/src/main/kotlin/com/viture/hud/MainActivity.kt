@@ -2,13 +2,15 @@ package com.viture.hud
 
 import android.Manifest
 import android.app.Activity
+import android.content.ContentValues
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.hardware.display.DisplayManager
 import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
-import android.view.Display
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
@@ -99,7 +101,7 @@ class MainActivity : Activity() {
         // Set up action buttons
         captureButton.setOnClickListener { handleCapture() }
         settingsButton.setOnClickListener {
-            Toast.makeText(this, "Settings coming soon!", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, SettingsActivity::class.java))
         }
 
         // Start in text mode
@@ -228,20 +230,17 @@ class MainActivity : Activity() {
                     val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
                     val fileName = "viture_$timestamp.jpg"
 
-                    // Save to app-specific storage
-                    val dir = File(getExternalFilesDir(null), "captures")
-                    if (!dir.exists()) {
-                        dir.mkdirs()
-                    }
+                    val saveLocation = AppPreferences.getSaveLocation(this)
 
-                    val file = File(dir, fileName)
-                    FileOutputStream(file).use { output ->
-                        output.write(imageData)
-                    }
-
-                    runOnUiThread {
-                        Toast.makeText(this, "Photo saved: $fileName", Toast.LENGTH_SHORT).show()
-                        Log.d(TAG, "Photo saved: ${file.absolutePath}")
+                    when (saveLocation) {
+                        AppPreferences.SaveLocation.CAMERA_ROLL -> {
+                            // Save to Pictures/VitureHUD using MediaStore (visible in gallery)
+                            saveToMediaStore(imageData, fileName)
+                        }
+                        AppPreferences.SaveLocation.APP_STORAGE -> {
+                            // Save to app-specific storage (private)
+                            saveToAppStorage(imageData, fileName)
+                        }
                     }
 
                 } catch (e: Exception) {
@@ -251,6 +250,62 @@ class MainActivity : Activity() {
                     }
                 }
             }.start()
+        }
+    }
+
+    /**
+     * Save photo to MediaStore (Pictures/VitureHUD) - visible in gallery
+     */
+    private fun saveToMediaStore(imageData: ByteArray, fileName: String) {
+        val contentValues = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
+            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/VitureHUD")
+                put(MediaStore.Images.Media.IS_PENDING, 1)
+            }
+        }
+
+        val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+
+        if (uri != null) {
+            contentResolver.openOutputStream(uri)?.use { output ->
+                output.write(imageData)
+            }
+
+            // Mark as complete (for Android 10+)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                contentValues.clear()
+                contentValues.put(MediaStore.Images.Media.IS_PENDING, 0)
+                contentResolver.update(uri, contentValues, null, null)
+            }
+
+            runOnUiThread {
+                Toast.makeText(this, "Photo saved to gallery: $fileName", Toast.LENGTH_SHORT).show()
+                Log.d(TAG, "Photo saved to MediaStore: $uri")
+            }
+        } else {
+            throw Exception("Failed to create MediaStore entry")
+        }
+    }
+
+    /**
+     * Save photo to app-specific storage (private)
+     */
+    private fun saveToAppStorage(imageData: ByteArray, fileName: String) {
+        val dir = File(getExternalFilesDir(null), "captures")
+        if (!dir.exists()) {
+            dir.mkdirs()
+        }
+
+        val file = File(dir, fileName)
+        FileOutputStream(file).use { output ->
+            output.write(imageData)
+        }
+
+        runOnUiThread {
+            Toast.makeText(this, "Photo saved: $fileName", Toast.LENGTH_SHORT).show()
+            Log.d(TAG, "Photo saved: ${file.absolutePath}")
         }
     }
 

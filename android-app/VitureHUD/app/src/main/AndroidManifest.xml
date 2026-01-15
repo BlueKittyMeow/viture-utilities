@@ -44,6 +44,13 @@
                 android:resource="@xml/device_filter" />
         </activity>
 
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false"
+            android:resizeableActivity="true"
+            android:configChanges="screenSize|screenLayout|orientation|keyboardHidden"
+            android:theme="@style/Theme.VitureHUD" />
+
     </application>
 
 </manifest>
