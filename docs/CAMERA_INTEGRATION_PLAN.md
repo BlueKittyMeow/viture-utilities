@@ -2,8 +2,14 @@
 ## Viture HUD Android App - Camera Implementation Strategy
 
 **Date:** 2026-01-14
-**Status:** Ready for Implementation
+**Status:** Ready for Implementation (Reviewed & Enhanced)
 **Reviewers:** Claude (Architecture), Gemini (Code Review), Codex (Lint/Quality)
+
+**Review Status:**
+- ✅ Gemini review complete - coroutine enhancements incorporated
+- ✅ Codex review complete - permission clarifications added
+- ✅ Claude review complete - DeX camera contradiction resolved
+- See: `docs/gemini-findings.md`, `docs/codex-findings.md`, `docs/claude-findings.md`
 
 ---
 
@@ -67,9 +73,16 @@ This document outlines the implementation plan for integrating USB camera functi
 ### Permissions Required
 ```xml
 <!-- Already configured in AndroidManifest.xml -->
-<uses-permission android:name="android.permission.CAMERA" />
-<uses-feature android:name="android.hardware.usb.host" android:required="true" />
+<uses-feature android:name="android.hardware.usb.host" android:required="true" /> ✓
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> ✓
+
+<!-- NOT REQUIRED for USB cameras: -->
+<!-- <uses-permission android:name="android.permission.CAMERA" /> -->
+<!-- The CAMERA permission is only needed for built-in device cameras via Camera2 API -->
+<!-- USB cameras accessed via USB Host API do NOT require this permission -->
 ```
+
+**Note:** Our manifest is correct as-is. We do NOT need `android.permission.CAMERA` because we're accessing a USB camera via USB Host API, not the device's built-in cameras.
 
 ### USB Device Filter
 ```xml
@@ -718,6 +731,235 @@ override fun onDestroy() {
     super.onDestroy()
 }
 ```
+
+---
+
+### Phase 3.5: Code Enhancements (Recommended)
+
+**Based on team code review, these enhancements improve robustness and follow Android best practices.**
+
+#### Enhancement 1: Use Coroutines Instead of Raw Threads (Gemini Suggestion)
+
+**Why:** Lifecycle-aware, structured concurrency, better testability
+
+**Update MainActivity.kt:**
+```kotlin
+class MainActivity : Activity() {
+    // Add coroutine scope
+    private val ioScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+
+    // Replace Thread-based capture with coroutine-based
+    private fun capturePhoto() {
+        ioScope.launch {
+            try {
+                val imageData = vitureCamera?.captureStillImage() ?: return@launch
+                val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
+                val fileName = "viture_$timestamp.jpg"
+
+                // Save to app-specific storage
+                val dir = File(getExternalFilesDir(null), "captures")
+                if (!dir.exists()) {
+                    dir.mkdirs()
+                }
+
+                val file = File(dir, fileName)
+                FileOutputStream(file).use { output ->
+                    output.write(imageData)
+                }
+
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@MainActivity, "Photo saved: $fileName", Toast.LENGTH_SHORT).show()
+                }
+
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@MainActivity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        ioScope.cancel() // Clean up coroutines
+        vitureCamera?.release()
+        super.onDestroy()
+    }
+}
+```
+
+**Update VitureCamera.kt to support coroutines:**
+```kotlin
+suspend fun captureStillImage(): ByteArray = suspendCancellableCoroutine { continuation ->
+    try {
+        if (!isConnected) {
+            continuation.resumeWithException(IllegalStateException("Camera not connected"))
+            return@suspendCancellableCoroutine
+        }
+
+        uvcCamera?.captureStillImage { data ->
+            continuation.resume(data)
+        }
+    } catch (e: Exception) {
+        continuation.resumeWithException(e)
+    }
+}
+```
+
+**Required import:**
+```kotlin
+import kotlinx.coroutines.*
+import kotlin.coroutines.suspendCoroutine
+```
+
+#### Enhancement 2: USB Permission Persistence
+
+**Why:** Avoids permission dialog on every app launch
+
+**Update AndroidManifest.xml:**
+```xml
+<activity android:name=".MainActivity" ...>
+    <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+    </intent-filter>
+
+    <!-- Add USB device attached intent -->
+    <intent-filter>
+        <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
+    </intent-filter>
+
+    <meta-data
+        android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
+        android:resource="@xml/device_filter" />
+</activity>
+```
+
+**Update VitureCamera.kt deviceListener:**
+```kotlin
+override fun onAttach(device: UsbDevice?) {
+    device?.let {
+        if (it.vendorId == VITURE_VENDOR_ID && it.productId == VITURE_PRODUCT_ID) {
+            Log.d(TAG, "Viture camera attached")
+
+            // Check if we already have permission
+            if (usbMonitor?.hasPermission(it) == true) {
+                Log.d(TAG, "Permission already granted, connecting...")
+                // Permission already granted, connect immediately
+                // USBMonitor will call onConnect automatically
+            } else {
+                usbMonitor?.requestPermission(it)
+            }
+        }
+    }
+}
+```
+
+#### Enhancement 3: Automatic Frame Format Detection
+
+**Why:** Viture camera may support multiple formats; detect best one automatically
+
+**Add to VitureCamera.kt:**
+```kotlin
+private fun detectBestFormat(): Int {
+    val supportedFormats = uvcCamera?.supportedSizeList
+        ?.filter { it.width == CAMERA_WIDTH && it.height == CAMERA_HEIGHT }
+        ?.map { it.type }
+        ?.distinct()
+
+    Log.d(TAG, "Supported formats at ${CAMERA_WIDTH}x${CAMERA_HEIGHT}: $supportedFormats")
+
+    return when {
+        supportedFormats?.contains(UVCCamera.FRAME_FORMAT_MJPEG) == true -> {
+            Log.d(TAG, "Using MJPEG format (preferred)")
+            UVCCamera.FRAME_FORMAT_MJPEG
+        }
+        supportedFormats?.contains(UVCCamera.FRAME_FORMAT_YUYV) == true -> {
+            Log.d(TAG, "Using YUYV format (fallback)")
+            UVCCamera.FRAME_FORMAT_YUYV
+        }
+        else -> {
+            Log.w(TAG, "No preferred format found, using MJPEG as default")
+            UVCCamera.FRAME_FORMAT_MJPEG
+        }
+    }
+}
+
+// Update openCamera to use detection:
+private fun openCamera(ctrlBlock: USBMonitor.UsbControlBlock) {
+    try {
+        uvcCamera = UVCCamera()
+        uvcCamera?.open(ctrlBlock)
+
+        // Detect best format
+        val format = detectBestFormat()
+
+        // Configure preview
+        uvcCamera?.setPreviewSize(
+            CAMERA_WIDTH,
+            CAMERA_HEIGHT,
+            CAMERA_FPS_MIN,
+            CAMERA_FPS_MAX,
+            format,  // Use detected format
+            UVCCamera.DEFAULT_BANDWIDTH
+        )
+
+        isConnected = true
+        onCameraConnected?.invoke()
+
+        Log.d(TAG, "Camera configured successfully")
+
+    } catch (e: Exception) {
+        Log.e(TAG, "Failed to open camera", e)
+        onCameraError?.invoke("Failed to open camera: ${e.message}")
+        closeCamera()
+    }
+}
+```
+
+#### Enhancement 4: DeX Mode Surface Retry Logic
+
+**Why:** DeX mode may have different timing for surface creation
+
+**Add to VitureCamera.kt:**
+```kotlin
+fun startPreview(surface: Surface) {
+    startPreviewWithRetry(surface, attempts = 3)
+}
+
+private fun startPreviewWithRetry(surface: Surface, attempts: Int) {
+    try {
+        if (!isConnected) {
+            Log.w(TAG, "Cannot start preview: camera not connected")
+            return
+        }
+
+        uvcCamera?.setPreviewDisplay(surface)
+        uvcCamera?.startPreview()
+        Log.d(TAG, "Preview started successfully")
+
+    } catch (e: Exception) {
+        if (attempts > 0) {
+            Log.w(TAG, "Preview start failed, retrying... ($attempts attempts left)")
+            // Use Handler to retry after delay
+            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                startPreviewWithRetry(surface, attempts - 1)
+            }, 500) // 500ms delay
+        } else {
+            Log.e(TAG, "Failed to start preview after all retries", e)
+            onCameraError?.invoke("Failed to start preview: ${e.message}")
+        }
+    }
+}
+```
+
+**Benefits of Enhancements:**
+- ✅ More robust error handling
+- ✅ Better lifecycle management (no leaks)
+- ✅ Modern Android best practices
+- ✅ Improved user experience (fewer permission dialogs)
+- ✅ Automatic format adaptation
+
+**Implementation Note:** These are recommended but not required. The base implementation will work without them. Add enhancements incrementally after basic functionality is confirmed working.
 
 ---
 

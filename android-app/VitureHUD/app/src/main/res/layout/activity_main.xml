@@ -6,7 +6,27 @@
     android:layout_height="match_parent"
     android:background="#000000">
 
-    <!-- HUD Container - fixed size on left side -->
+    <!--
+        HUD Container - Compact left-side panel with FIXED dimensions
+
+        LAYOUT DECISION (2026-01-14):
+        This layout uses fixed dimensions (650dp x 550dp) instead of percentage-based
+        constraints (app:layout_constraintWidth_percent="0.35") because:
+
+        1. Percentage constraints were tested but DID NOT WORK correctly in Samsung DeX mode
+        2. Fixed dimensions were verified working on Samsung Galaxy S22 Ultra in DeX mode
+        3. User tested and approved: "Love it! That's perfect!"
+        4. Target display: 1920x1080 Viture glasses via DeX
+
+        DO NOT change to percentage-based constraints without testing in actual DeX mode.
+        See docs/LAYOUT_ISSUE_ANALYSIS.md for full details on why percentage constraints failed.
+
+        Positioning:
+        - 24dp from left edge (prevents edge cutoff)
+        - 250dp top/bottom margins (centers vertically, avoids top/bottom 25% per user request)
+        - Black background (#000000) = transparent in Viture glasses
+        - HUD panel (#1A1A1A) = visible dark gray overlay
+    -->
     <LinearLayout
         android:id="@+id/hudContainer"
         android:layout_width="650dp"

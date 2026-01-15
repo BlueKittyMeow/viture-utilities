@@ -7,9 +7,10 @@
 
 ## Summary
 
-❌ **Viture cameras NOT accessible in DeX mode**
+⚠️ **USB camera access via kernel (V4L2) does NOT work**
+✅ **USB camera access via userspace (USB Host API) DOES work**
 
-The Viture glasses are detected as USB devices, but Android does not expose them as video devices that apps can access.
+**IMPORTANT:** This document originally tested only kernel-level access. Subsequent testing with CameraFi app proved that userspace UVC access IS viable. See "CameraFi Validation" section below.
 
 ## Detailed Findings
 
@@ -25,12 +26,37 @@ The Viture cameras do NOT appear as `/dev/video*` devices:
 - Video devices remain: video0, video1, video2, video3, video32, video33
 - video2/video3 are a different USB camera (vendor 0c45, not Viture)
 
-### Root Cause
-Android (including DeX mode) does not support USB cameras natively. The OS:
-1. Sees the Viture glasses on the USB bus
-2. Does NOT load the UVC (USB Video Class) driver
-3. Does NOT create `/dev/video*` device nodes for the cameras
-4. Camera2 API only works with built-in phone cameras
+### Root Cause (Kernel-Level Access)
+Android (including DeX mode) does not expose USB cameras at the kernel level. The OS:
+1. Sees the Viture glasses on the USB bus ✓
+2. Does NOT load the UVC (USB Video Class) kernel driver ✗
+3. Does NOT create `/dev/video*` device nodes for the cameras ✗
+4. Camera2 API only works with built-in phone cameras ✗
+
+## CameraFi Validation ✅
+
+**Test Date:** 2026-01-14 (after initial V4L2 testing)
+**App:** CameraFi (from Play Store)
+**Result:** ✅ **SUCCESS - Camera accessible!**
+
+### What Worked
+- CameraFi detected Viture camera as "USB 2.0 Camera"
+- Camera preview displayed (though at low resolution due to app settings)
+- Proves that **userspace UVC access works** in DeX mode
+- No root required, no kernel modifications needed
+
+### Technical Explanation
+CameraFi uses **Android USB Host API** to communicate with USB cameras:
+- Bypasses kernel-level drivers
+- Direct userspace communication with USB device
+- Implements UVC protocol in app layer
+- This is the approach our VitureHUD app will use
+
+### Implications for Our Project
+✅ **Camera access IS possible** via USB Host API + UVC library
+✅ **DeX mode is NOT a blocker** for our implementation
+✅ **Userspace approach is proven** and viable
+❌ **Kernel approach (V4L2) remains blocked** (but we don't need it)
 
 ## Implications
 
@@ -38,23 +64,33 @@ Android (including DeX mode) does not support USB cameras natively. The OS:
 ✓ Display output (HDMI/DisplayPort alt mode)
 ✓ Touch input (if supported)
 ✓ USB OTG devices (keyboards, mice, storage)
+✓ **Viture camera access via USB Host API + UVC library** ⭐
+✓ **Userspace UVC apps (CameraFi, our VitureHUD app)**
 
 ### What Doesn't Work in DeX Mode
-✗ Viture camera access
-✗ Any USB camera access (not Viture-specific)
-✗ Camera2 API for external cameras
+✗ Kernel-level camera access (`/dev/video*` devices)
+✗ V4L2 API for USB cameras
+✗ Camera2 API for external cameras (only works with built-in cameras)
 
-## Alternative Approaches
+## Implementation Approaches
 
-### Option 1: Rooted Android + Custom Kernel ⚠️
-- Root the phone
-- Load custom kernel with UVC driver
-- May expose cameras as `/dev/video*`
-- **Pros:** Could work
-- **Cons:** Voids warranty, complex, may break DeX/Knox
+### Option 1: Native Android App ⭐ RECOMMENDED
+**Use USB Host API + UVCCamera library directly on phone**
 
-### Option 2: Linux-Based Portable Device ⭐ RECOMMENDED
-Use a small Linux computer as a "bridge" device:
+- **Status:** ✅ Proven viable by CameraFi
+- **Approach:** VitureHUD Android app (already in development)
+- **Pros:**
+  - No additional hardware needed
+  - Truly portable (just phone + glasses)
+  - Works in DeX mode
+  - No root required
+- **Cons:**
+  - Requires UVCCamera library integration
+  - JitPack dependencies failed (using local build)
+- **Implementation:** See `docs/CAMERA_INTEGRATION_PLAN.md`
+
+### Option 2: Linux-Based Portable Device (ALTERNATIVE)
+Use a small Linux computer as a "bridge" device (no longer necessary, but still viable):
 
 **Hardware Options:**
 - Raspberry Pi 4 or Pi 5 (~$75)
@@ -95,7 +131,25 @@ Viture has mentioned camera API access in future firmware:
 
 ## Recommendations
 
-### For Portable HUD Solution
+### ⭐ PRIMARY RECOMMENDATION: Native Android App
+**Proceed with VitureHUD Android app development:**
+
+1. **Implementation:**
+   - Follow `docs/CAMERA_INTEGRATION_PLAN.md`
+   - Clone and build UVCCamera library locally
+   - Integrate with existing VitureHUD app
+   - Use USB Host API for camera access
+
+2. **Timeline:**
+   - Estimated: 8-13 hours implementation
+   - Result: Fully portable, phone-only solution
+   - No additional hardware needed
+
+3. **Status:** Ready to implement (plan complete)
+
+### ALTERNATIVE: Raspberry Pi-Based System
+**If native Android approach fails or additional features needed:**
+
 Build a **Raspberry Pi-based system**:
 
 1. **Hardware:**

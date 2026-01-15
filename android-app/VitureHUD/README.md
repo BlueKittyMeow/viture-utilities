@@ -2,7 +2,23 @@
 
 Native Android app for Viture Luma Pro glasses with HUD overlay, camera capture, and text editor.
 
-## ✅ What This App Does
+## 🚦 Implementation Status
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Text Editor | ✅ **Working** | Monospace, green-on-black, multi-line |
+| HUD Layout | ✅ **Working** | 650dp x 550dp left-side compact panel |
+| DeX Display Targeting | ⚠️ **Partial** | App must be manually dragged to glasses display in DeX |
+| Camera Mode Toggle | 🚧 **UI Only** | Button exists but disabled, awaiting camera integration |
+| Camera Preview | ❌ **Not Started** | Awaiting UVCCamera library integration |
+| Photo Capture | ❌ **Not Started** | Awaiting UVCCamera library integration |
+| Settings Menu | ❌ **Not Started** | Button shows "Coming soon" toast |
+| Auto-save | ❌ **Not Started** | Manual save only |
+
+**Current build:** Text editor MVP with camera integration in progress
+**Next milestone:** Complete camera integration per `docs/CAMERA_INTEGRATION_PLAN.md`
+
+## ✅ What This App Will Do (When Complete)
 
 1. **Launches fullscreen on Viture glasses** (secondary HDMI display in DeX mode)
 2. **Camera access at native 1920x1080** resolution (fixes CameraFi blurriness)
@@ -122,12 +138,19 @@ The app automatically detects Viture cameras via USB vendor/product ID:
 
 ### Adjust HUD Size
 
-Edit `activity_main.xml` line 62:
+**Note:** Layout uses fixed dimensions (650dp x 550dp) because percentage-based constraints
+did not work correctly in Samsung DeX mode. See layout comments in `activity_main.xml` for details.
+
+To adjust size, edit `activity_main.xml` (around line 32-33):
 
 ```xml
-app:layout_constraintWidth_percent="0.5"  <!-- 50% of screen -->
-<!-- Change to 0.3 for 30%, 0.7 for 70%, etc. -->
+android:layout_width="650dp"   <!-- Change to 800dp for wider, 500dp for narrower -->
+android:layout_height="550dp"  <!-- Change to 700dp for taller, 400dp for shorter -->
 ```
+
+**Tested dimensions:**
+- Current: 650dp x 550dp (verified working in DeX on 1920x1080 display)
+- Approximate screen coverage: ~34% width, ~51% height
 
 ### Hide Camera Preview
 
@@ -291,15 +314,22 @@ VitureHUD/
 
 ## 🎯 Success Criteria
 
-✅ **MVP Complete when:**
-- App launches on glasses display
-- Camera shows clear 1920x1080 image
-- Can capture and save photos
-- Can type and edit notes
-- Runs without crashes
+✅ **Phase 1 MVP Complete when:**
+- [x] App launches and displays on screen
+- [x] HUD layout renders correctly in DeX
+- [x] Text editor accepts input
+- [x] Black background renders properly
+- [ ] Camera integration complete (in progress)
+- [ ] Camera shows clear 1920x1080 image
+- [ ] Can capture and save photos
+- [ ] Runs without crashes on connect/disconnect
 
 ---
 
-**Current Status:** MVP code complete, ready for testing!
+**Current Status:** Text editor MVP functional, camera integration in progress
 
-Next: Build and test on your phone with glasses connected.
+**Next steps:**
+1. Follow `docs/CAMERA_INTEGRATION_PLAN.md` to integrate UVCCamera library
+2. Test camera preview and capture functionality
+3. Implement auto-save for text editor
+4. Add settings menu
