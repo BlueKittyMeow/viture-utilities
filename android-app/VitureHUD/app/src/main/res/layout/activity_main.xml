@@ -1,127 +1,137 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000">
+    android:orientation="vertical"
+    android:background="#1A1A1A"
+    android:padding="16dp">
 
     <!--
-        HUD Container - Compact left-side panel with FIXED dimensions
+        Phone Controls Layout
 
-        LAYOUT DECISION (2026-01-14):
-        This layout uses fixed dimensions (650dp x 550dp) instead of percentage-based
-        constraints (app:layout_constraintWidth_percent="0.35") because:
+        This layout shows on the PHONE only - controls for the HUD.
+        The actual HUD content appears on the glasses via HUDPresentation.
 
-        1. Percentage constraints were tested but DID NOT WORK correctly in Samsung DeX mode
-        2. Fixed dimensions were verified working on Samsung Galaxy S22 Ultra in DeX mode
-        3. User tested and approved: "Love it! That's perfect!"
-        4. Target display: 1920x1080 Viture glasses via DeX
-
-        DO NOT change to percentage-based constraints without testing in actual DeX mode.
-        See docs/LAYOUT_ISSUE_ANALYSIS.md for full details on why percentage constraints failed.
-
-        Positioning:
-        - 24dp from left edge (prevents edge cutoff)
-        - 250dp top/bottom margins (centers vertically, avoids top/bottom 25% per user request)
-        - Black background (#000000) = transparent in Viture glasses
-        - HUD panel (#1A1A1A) = visible dark gray overlay
+        Components:
+        - Status bar (connection info)
+        - Mode toggle buttons (Text/Camera)
+        - Text input (synced to glasses in real-time)
+        - Action buttons (Capture, Settings)
     -->
+
+    <!-- Status Bar -->
+    <TextView
+        android:id="@+id/statusText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Initializing..."
+        android:textColor="#00FF00"
+        android:textSize="14sp"
+        android:fontFamily="monospace"
+        android:gravity="center"
+        android:padding="12dp"
+        android:background="#0A0A0A"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Mode Toggle Buttons -->
     <LinearLayout
-        android:id="@+id/hudContainer"
-        android:layout_width="650dp"
-        android:layout_height="550dp"
-        android:orientation="vertical"
-        android:background="#1A1A1A"
-        android:padding="16dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="250dp"
-        android:layout_marginBottom="250dp">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp">
 
-        <!-- Mode Toggle Buttons -->
-        <LinearLayout
-            android:layout_width="match_parent"
+        <Button
+            android:id="@+id/modeTextButton"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="12dp">
+            android:layout_weight="1"
+            android:text="Text Mode"
+            android:textSize="16sp"
+            android:backgroundTint="#00AA00"
+            android:layout_marginEnd="8dp" />
 
-            <Button
-                android:id="@+id/modeTextButton"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Text Edit"
-                android:textSize="14sp"
-                android:backgroundTint="#00AA00"
-                android:layout_marginEnd="8dp" />
-
-            <Button
-                android:id="@+id/modeCameraButton"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Camera"
-                android:textSize="14sp"
-                android:enabled="false"
-                android:alpha="0.5" />
-        </LinearLayout>
-
-        <!-- Action Buttons -->
-        <LinearLayout
-            android:layout_width="match_parent"
+        <Button
+            android:id="@+id/modeCameraButton"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="12dp">
-
-            <Button
-                android:id="@+id/captureButton"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/capture_button"
-                android:textSize="14sp"
-                android:layout_marginEnd="8dp" />
-
-            <Button
-                android:id="@+id/settingsButton"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/settings_button"
-                android:textSize="14sp" />
-        </LinearLayout>
-
-        <!-- Content Area (Text Editor or Camera Preview) -->
-        <FrameLayout
-            android:id="@+id/contentArea"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1">
-
-            <!-- Text Editor (default visible) -->
-            <EditText
-                android:id="@+id/textEditor"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="#0A0A0A"
-                android:gravity="top|start"
-                android:hint="@string/text_hint"
-                android:padding="12dp"
-                android:textColor="#00FF00"
-                android:textColorHint="#006600"
-                android:textSize="16sp"
-                android:inputType="textMultiLine|textNoSuggestions"
-                android:fontFamily="monospace"
-                android:scrollbars="vertical" />
-
-            <!-- Camera Preview (hidden for now, will be toggled) -->
-            <!-- Future: Camera preview will go here -->
-
-        </FrameLayout>
-
+            android:layout_weight="1"
+            android:text="Camera Mode"
+            android:textSize="16sp"
+            android:enabled="false"
+            android:alpha="0.5" />
     </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- Text Input Area (visible in text mode) -->
+    <EditText
+        android:id="@+id/textInput"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#0A0A0A"
+        android:gravity="top|start"
+        android:hint="@string/text_hint"
+        android:padding="12dp"
+        android:textColor="#00FF00"
+        android:textColorHint="#006600"
+        android:textSize="16sp"
+        android:inputType="textMultiLine|textNoSuggestions"
+        android:fontFamily="monospace"
+        android:scrollbars="vertical" />
+
+    <!-- Camera Mode Placeholder (shown when in camera mode) -->
+    <LinearLayout
+        android:id="@+id/cameraPlaceholder"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:background="#0A0A0A"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Camera Preview on Glasses"
+            android:textColor="#00AA00"
+            android:textSize="20sp"
+            android:fontFamily="monospace"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Look at your glasses to see the preview"
+            android:textColor="#666666"
+            android:textSize="14sp"
+            android:fontFamily="monospace" />
+    </LinearLayout>
+
+    <!-- Bottom Action Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="16dp">
+
+        <Button
+            android:id="@+id/captureButton"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_weight="2"
+            android:text="Save Note"
+            android:textSize="18sp"
+            android:backgroundTint="#00AA00"
+            android:layout_marginEnd="8dp" />
+
+        <Button
+            android:id="@+id/settingsButton"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_weight="1"
+            android:text="@string/settings_button"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+</LinearLayout>

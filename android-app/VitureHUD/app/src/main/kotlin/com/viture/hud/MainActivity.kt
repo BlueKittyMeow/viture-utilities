@@ -3,30 +3,42 @@ package com.viture.hud
 import android.Manifest
 import android.app.Activity
 import android.content.ContentValues
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.hardware.display.DisplayManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
-import android.view.SurfaceHolder
-import android.view.SurfaceView
 import android.view.View
-import android.view.WindowManager
 import android.widget.Button
 import android.widget.EditText
-import android.widget.FrameLayout
+import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.viture.hud.presentation.DisplayStateManager
+import com.viture.hud.presentation.HUDPresentation
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+/**
+ * Main Activity - Phone-side controls for the HUD.
+ *
+ * This activity runs on the phone screen and provides:
+ * - Text input field (synced to glasses display)
+ * - Camera capture button (when in camera mode)
+ * - Mode toggle between text and camera
+ * - Settings access
+ *
+ * The actual HUD content appears on the glasses via HUDPresentation,
+ * managed by DisplayStateManager.
+ */
 class MainActivity : Activity() {
 
     companion object {
@@ -34,56 +46,147 @@ class MainActivity : Activity() {
         private const val CAMERA_PERMISSION_REQUEST = 100
     }
 
-    private lateinit var textEditor: EditText
+    // Phone UI components
+    private lateinit var statusText: TextView
+    private lateinit var textInput: EditText
+    private lateinit var cameraPlaceholder: LinearLayout
     private lateinit var captureButton: Button
-    private lateinit var settingsButton: Button
     private lateinit var modeTextButton: Button
     private lateinit var modeCameraButton: Button
+    private lateinit var settingsButton: Button
 
-    // Camera components
+    // Display management
+    private lateinit var displayStateManager: DisplayStateManager
+
+    // Camera
     private var vitureCamera: VitureCamera? = null
-    private var surfaceView: SurfaceView? = null
     private var isCameraMode = false
+
+    // Reference to current presentation
+    private var hudPresentation: HUDPresentation? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Target the glasses display (HDMI) in DeX mode
-        targetGlassesDisplay()
-
         setContentView(R.layout.activity_main)
 
-        // Initialize UI references
-        textEditor = findViewById(R.id.textEditor)
-        captureButton = findViewById(R.id.captureButton)
-        settingsButton = findViewById(R.id.settingsButton)
-        modeTextButton = findViewById(R.id.modeTextButton)
-        modeCameraButton = findViewById(R.id.modeCameraButton)
+        // Initialize phone UI
+        initializePhoneUI()
 
-        // Request CAMERA permission (required for USB cameras on Android 13+)
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            Log.d(TAG, "Requesting CAMERA permission...")
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), CAMERA_PERMISSION_REQUEST)
-        }
+        // Initialize display state manager
+        initializeDisplayManager()
 
         // Initialize camera
-        vitureCamera = VitureCamera(this)
-        vitureCamera?.apply {
+        initializeCamera()
+
+        // Start in text mode
+        switchToTextMode()
+
+        Log.d(TAG, "MainActivity created - phone controls ready")
+    }
+
+    private fun initializePhoneUI() {
+        statusText = findViewById(R.id.statusText)
+        textInput = findViewById(R.id.textInput)
+        cameraPlaceholder = findViewById(R.id.cameraPlaceholder)
+        captureButton = findViewById(R.id.captureButton)
+        modeTextButton = findViewById(R.id.modeTextButton)
+        modeCameraButton = findViewById(R.id.modeCameraButton)
+        settingsButton = findViewById(R.id.settingsButton)
+
+        // Text input listener - sync to glasses
+        textInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                // Sync text to glasses display
+                hudPresentation?.updateText(s?.toString() ?: "")
+            }
+        })
+
+        // Mode buttons
+        modeTextButton.setOnClickListener { switchToTextMode() }
+        modeCameraButton.setOnClickListener { switchToCameraMode() }
+
+        // Capture button
+        captureButton.setOnClickListener { handleCapture() }
+
+        // Settings button
+        settingsButton.setOnClickListener {
+            startActivity(Intent(this, SettingsActivity::class.java))
+        }
+    }
+
+    private fun initializeDisplayManager() {
+        displayStateManager = DisplayStateManager(this).apply {
+            onGlassesConnected = { presentation ->
+                runOnUiThread {
+                    hudPresentation = presentation
+                    updateStatusText()
+                    Toast.makeText(this@MainActivity, "HUD active on glasses", Toast.LENGTH_SHORT).show()
+
+                    // If in text mode, sync current text
+                    if (!isCameraMode) {
+                        presentation.showTextMode()
+                        presentation.updateText(textInput.text.toString())
+                    }
+                }
+            }
+
+            onGlassesDisconnected = {
+                runOnUiThread {
+                    hudPresentation = null
+                    updateStatusText()
+
+                    // If in camera mode, stop preview and switch to text
+                    if (isCameraMode) {
+                        vitureCamera?.stopPreview()
+                        switchToTextMode()
+                    }
+
+                    Toast.makeText(this@MainActivity, "Glasses disconnected", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            onSurfaceReady = { surface ->
+                // Camera surface is ready on glasses - start preview if in camera mode
+                Log.d(TAG, "Surface ready from presentation")
+                if (isCameraMode && vitureCamera?.isConnected() == true) {
+                    Log.d(TAG, "Starting camera preview on glasses surface")
+                    vitureCamera?.startPreview(surface)
+                }
+            }
+        }
+
+        displayStateManager.start()
+    }
+
+    private fun initializeCamera() {
+        // Request camera permission
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+            != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.CAMERA),
+                CAMERA_PERMISSION_REQUEST
+            )
+        }
+
+        vitureCamera = VitureCamera(this).apply {
             onCameraConnected = {
                 runOnUiThread {
-                    Toast.makeText(this@MainActivity, "Camera connected", Toast.LENGTH_SHORT).show()
                     modeCameraButton.isEnabled = true
                     modeCameraButton.alpha = 1.0f
+                    updateStatusText()
                 }
             }
             onCameraDisconnected = {
                 runOnUiThread {
-                    Toast.makeText(this@MainActivity, "Camera disconnected", Toast.LENGTH_SHORT).show()
                     modeCameraButton.isEnabled = false
                     modeCameraButton.alpha = 0.5f
                     if (isCameraMode) {
                         switchToTextMode()
                     }
+                    updateStatusText()
                 }
             }
             onCameraError = { error ->
@@ -93,135 +196,73 @@ class MainActivity : Activity() {
             }
             initialize()
         }
-
-        // Set up mode toggle buttons
-        modeTextButton.setOnClickListener { switchToTextMode() }
-        modeCameraButton.setOnClickListener { switchToCameraMode() }
-
-        // Set up action buttons
-        captureButton.setOnClickListener { handleCapture() }
-        settingsButton.setOnClickListener {
-            startActivity(Intent(this, SettingsActivity::class.java))
-        }
-
-        // Start in text mode
-        switchToTextMode()
-
-        Log.d(TAG, "Viture HUD started - camera initialized")
     }
 
-    /**
-     * Switch to text editor mode
-     */
     private fun switchToTextMode() {
         isCameraMode = false
 
-        // Stop camera preview if running
+        // Stop camera preview
         vitureCamera?.stopPreview()
 
-        // Hide camera surface
-        surfaceView?.visibility = View.GONE
-
-        // Show text editor
-        textEditor.visibility = View.VISIBLE
-
-        // Update button colors
-        modeTextButton.backgroundTintList = android.content.res.ColorStateList.valueOf(0xFF00AA00.toInt())
+        // Update phone UI
+        textInput.visibility = View.VISIBLE
+        cameraPlaceholder.visibility = View.GONE
+        captureButton.text = "Save Note"
+        modeTextButton.backgroundTintList =
+            android.content.res.ColorStateList.valueOf(0xFF00AA00.toInt())
         modeCameraButton.backgroundTintList = null
 
-        // Update capture button
-        captureButton.text = "Save Note"
-        captureButton.isEnabled = false
+        // Update glasses display
+        hudPresentation?.apply {
+            showTextMode()
+            updateText(textInput.text.toString())
+        }
 
         Log.d(TAG, "Switched to text mode")
     }
 
-    /**
-     * Switch to camera preview mode
-     */
     private fun switchToCameraMode() {
         if (vitureCamera?.isConnected() != true) {
             Toast.makeText(this, "Camera not connected", Toast.LENGTH_SHORT).show()
             return
         }
 
+        if (!displayStateManager.isGlassesConnected()) {
+            Toast.makeText(this, "Connect glasses to use camera mode", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         isCameraMode = true
 
-        // Hide text editor
-        textEditor.visibility = View.GONE
-
-        // Create or show camera surface
-        if (surfaceView == null) {
-            createCameraSurface()
-        }
-        surfaceView?.visibility = View.VISIBLE
-
-        // Update button colors
-        modeCameraButton.backgroundTintList = android.content.res.ColorStateList.valueOf(0xFF00AA00.toInt())
+        // Update phone UI - hide text input, show placeholder
+        textInput.visibility = View.GONE
+        cameraPlaceholder.visibility = View.VISIBLE
+        captureButton.text = "Capture Photo"
+        modeCameraButton.backgroundTintList =
+            android.content.res.ColorStateList.valueOf(0xFF00AA00.toInt())
         modeTextButton.backgroundTintList = null
 
-        // Update capture button
-        captureButton.text = "Capture Photo"
-        captureButton.isEnabled = true
+        // Update glasses display to camera mode
+        hudPresentation?.showCameraMode()
+
+        // Preview will start when surface ready callback fires
 
         Log.d(TAG, "Switched to camera mode")
     }
 
-    /**
-     * Create camera preview surface
-     */
-    private fun createCameraSurface() {
-        // Get content area
-        val contentArea = findViewById<FrameLayout>(R.id.contentArea)
-
-        // Create SurfaceView for camera preview
-        surfaceView = SurfaceView(this)
-        surfaceView?.holder?.addCallback(object : SurfaceHolder.Callback {
-            override fun surfaceCreated(holder: SurfaceHolder) {
-                // Start camera preview when surface is ready
-                Log.d(TAG, "Surface created, starting preview")
-                vitureCamera?.startPreview(holder.surface)
-            }
-
-            override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
-                Log.d(TAG, "Surface changed: ${width}x${height}")
-            }
-
-            override fun surfaceDestroyed(holder: SurfaceHolder) {
-                // Stop preview when surface is destroyed
-                Log.d(TAG, "Surface destroyed, stopping preview")
-                vitureCamera?.stopPreview()
-            }
-        })
-
-        // Add to content area
-        contentArea.addView(surfaceView, FrameLayout.LayoutParams(
-            FrameLayout.LayoutParams.MATCH_PARENT,
-            FrameLayout.LayoutParams.MATCH_PARENT
-        ))
-    }
-
-    /**
-     * Handle capture button press (mode-dependent)
-     */
     private fun handleCapture() {
-        if (!isCameraMode) {
-            // In text mode - save text note
-            val text = textEditor.text.toString()
+        if (isCameraMode) {
+            capturePhoto()
+        } else {
+            val text = textInput.text.toString()
             if (text.isNotEmpty()) {
                 saveTextNote(text)
             } else {
                 Toast.makeText(this, "Nothing to save", Toast.LENGTH_SHORT).show()
             }
-        } else {
-            // In camera mode - capture photo
-            capturePhoto()
         }
     }
 
-    /**
-     * Capture photo from camera
-     */
     private fun capturePhoto() {
         vitureCamera?.captureStillImage { imageData ->
             // Save on background thread
@@ -234,11 +275,9 @@ class MainActivity : Activity() {
 
                     when (saveLocation) {
                         AppPreferences.SaveLocation.CAMERA_ROLL -> {
-                            // Save to Pictures/VitureHUD using MediaStore (visible in gallery)
                             saveToMediaStore(imageData, fileName)
                         }
                         AppPreferences.SaveLocation.APP_STORAGE -> {
-                            // Save to app-specific storage (private)
                             saveToAppStorage(imageData, fileName)
                         }
                     }
@@ -253,9 +292,6 @@ class MainActivity : Activity() {
         }
     }
 
-    /**
-     * Save photo to MediaStore (Pictures/VitureHUD) - visible in gallery
-     */
     private fun saveToMediaStore(imageData: ByteArray, fileName: String) {
         val contentValues = ContentValues().apply {
             put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
@@ -273,7 +309,6 @@ class MainActivity : Activity() {
                 output.write(imageData)
             }
 
-            // Mark as complete (for Android 10+)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 contentValues.clear()
                 contentValues.put(MediaStore.Images.Media.IS_PENDING, 0)
@@ -289,9 +324,6 @@ class MainActivity : Activity() {
         }
     }
 
-    /**
-     * Save photo to app-specific storage (private)
-     */
     private fun saveToAppStorage(imageData: ByteArray, fileName: String) {
         val dir = File(getExternalFilesDir(null), "captures")
         if (!dir.exists()) {
@@ -309,9 +341,6 @@ class MainActivity : Activity() {
         }
     }
 
-    /**
-     * Save text note to file
-     */
     private fun saveTextNote(text: String) {
         Thread {
             try {
@@ -340,47 +369,16 @@ class MainActivity : Activity() {
         }.start()
     }
 
-    /**
-     * Check for secondary display and make fullscreen
-     *
-     * Note: Auto-launching on secondary display requires special setup.
-     * For now, in DeX mode: drag this window to your glasses display.
-     */
-    private fun targetGlassesDisplay() {
-        val displayManager = getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
-        val displays = displayManager.displays
-
-        Log.d(TAG, "Found ${displays.size} displays")
-
-        // Make fullscreen
-        @Suppress("DEPRECATION")
-        window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-
-        // Check for secondary display
-        var secondaryDisplayFound = false
-        for (display in displays) {
-            Log.d(TAG, "Display ${display.displayId}: ${display.name}")
-            if (display.displayId > 0) {
-                secondaryDisplayFound = true
-                Log.d(TAG, "Secondary display detected: ${display.name}")
-            }
-        }
-
-        if (secondaryDisplayFound) {
-            Toast.makeText(
-                this,
-                "Glasses detected! In DeX: drag window to glasses display",
-                Toast.LENGTH_LONG
-            ).show()
-        }
+    private fun updateStatusText() {
+        val glassesStatus = if (displayStateManager.isGlassesConnected()) "Glasses: Connected" else "Glasses: Not connected"
+        val cameraStatus = if (vitureCamera?.isConnected() == true) "Camera: Ready" else "Camera: Not connected"
+        statusText.text = "$glassesStatus | $cameraStatus"
     }
 
-    /**
-     * Clean up camera resources when activity is destroyed
-     */
     override fun onDestroy() {
+        displayStateManager.stop()
         vitureCamera?.release()
         super.onDestroy()
-        Log.d(TAG, "Viture HUD destroyed - camera released")
+        Log.d(TAG, "MainActivity destroyed")
     }
 }

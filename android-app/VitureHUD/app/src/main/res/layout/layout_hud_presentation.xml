@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/hudRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000">
+
+    <!--
+        HUD Presentation Layout - GLASSES ONLY
+
+        This layout appears ONLY on the glasses (secondary display).
+        Black background (#000000) = transparent in Viture glasses.
+
+        Content is positioned in a container on the left side,
+        using the proven 650x550dp dimensions from the original layout.
+
+        Positioning:
+        - 24dp from left edge (prevents edge cutoff)
+        - Centered vertically
+        - Camera SurfaceView added programmatically when in camera mode
+    -->
+
+    <FrameLayout
+        android:id="@+id/hudContentContainer"
+        android:layout_width="650dp"
+        android:layout_height="550dp"
+        android:layout_gravity="start|center_vertical"
+        android:layout_marginStart="24dp"
+        android:background="#1A1A1A"
+        android:padding="16dp">
+
+        <!-- Text Display Container (shown in text mode) -->
+        <ScrollView
+            android:id="@+id/textContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/hudTextDisplay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#0A0A0A"
+                android:padding="12dp"
+                android:textColor="#00FF00"
+                android:textSize="18sp"
+                android:fontFamily="monospace"
+                android:lineSpacingMultiplier="1.2"
+                android:text=""
+                android:gravity="top|start" />
+        </ScrollView>
+
+        <!--
+            Camera SurfaceView is added programmatically in HUDPresentation.kt
+            when switching to camera mode. This keeps the layout clean and
+            allows proper surface lifecycle management.
+        -->
+
+    </FrameLayout>
+
+</FrameLayout>
