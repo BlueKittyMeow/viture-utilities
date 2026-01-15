@@ -559,6 +559,121 @@ uvc_error_t uvc_get_stream_ctrl_format_size_fps(uvc_device_handle_t *devh,
 		}
 	}
 
+	// ============================================================================
+	// PHASE 2.5 FALLBACK: Try hardcoded probe/commit for devices without descriptors
+	// This handles cameras like Viture that don't advertise format descriptors
+	// but still support standard UVC probe/commit protocol
+	// ============================================================================
+	LOGI("=== PHASE 2.5: No format descriptors found, trying hardcoded probe/commit ===");
+
+	// Get the first streaming interface
+	stream_if = devh->info->stream_ifs;
+	if (stream_if) {
+		LOGI("PHASE 2.5: Found streaming interface %d, endpoint 0x%02x",
+			stream_if->bInterfaceNumber, stream_if->bEndpointAddress);
+
+		// Claim the interface first
+		result = uvc_claim_if(devh, stream_if->bInterfaceNumber);
+		if (result != UVC_SUCCESS) {
+			LOGE("PHASE 2.5: Failed to claim interface %d: err=%d",
+				stream_if->bInterfaceNumber, result);
+			goto fallback_failed;
+		}
+
+		// Try to get current probe values from device first
+		ctrl->bInterfaceNumber = stream_if->bInterfaceNumber;
+
+		LOGI("PHASE 2.5: Attempting GET_CUR probe to see current device state...");
+		result = uvc_query_stream_ctrl(devh, ctrl, 1, UVC_GET_CUR);
+		if (result == UVC_SUCCESS) {
+			LOGI("PHASE 2.5: GET_CUR probe SUCCESS! Device responded with:");
+			LOGI("  bFormatIndex=%d, bFrameIndex=%d", ctrl->bFormatIndex, ctrl->bFrameIndex);
+			LOGI("  dwFrameInterval=%u (%.1f fps)", ctrl->dwFrameInterval,
+				ctrl->dwFrameInterval ? 10000000.0 / ctrl->dwFrameInterval : 0);
+			LOGI("  dwMaxVideoFrameSize=%u", ctrl->dwMaxVideoFrameSize);
+			LOGI("  dwMaxPayloadTransferSize=%u", ctrl->dwMaxPayloadTransferSize);
+		} else {
+			LOGW("PHASE 2.5: GET_CUR probe failed (err=%d), trying with hardcoded values...", result);
+		}
+
+		// Try different format combinations
+		// Format index 1 = typically first format (often MJPEG)
+		// Format index 2 = second format (often YUYV)
+		int format_attempts[][2] = {
+			{1, 1},  // Format 1, Frame 1 (most common)
+			{1, 2},  // Format 1, Frame 2
+			{2, 1},  // Format 2, Frame 1
+			{2, 2},  // Format 2, Frame 2
+		};
+		int num_attempts = sizeof(format_attempts) / sizeof(format_attempts[0]);
+
+		for (int i = 0; i < num_attempts; i++) {
+			int fmt_idx = format_attempts[i][0];
+			int frm_idx = format_attempts[i][1];
+
+			LOGI("PHASE 2.5: Trying probe with bFormatIndex=%d, bFrameIndex=%d", fmt_idx, frm_idx);
+
+			// Populate control structure with hardcoded values
+			memset(ctrl, 0, sizeof(*ctrl));
+			ctrl->bInterfaceNumber = stream_if->bInterfaceNumber;
+			ctrl->bmHint = 1;  // Keep frame interval fixed
+			ctrl->bFormatIndex = fmt_idx;
+			ctrl->bFrameIndex = frm_idx;
+			ctrl->dwFrameInterval = 333333;  // 30 fps (10,000,000 / 30 = 333,333 in 100ns units)
+
+			// For MJPEG 1920x1080, typical max frame size is ~500KB
+			ctrl->dwMaxVideoFrameSize = 512 * 1024;  // 512KB
+			ctrl->dwMaxPayloadTransferSize = 3072;   // Typical USB 2.0 bulk/iso transfer size
+
+			// Try SET_CUR probe
+			LOGI("PHASE 2.5: Sending SET_CUR probe...");
+			result = uvc_query_stream_ctrl(devh, ctrl, 1, UVC_SET_CUR);
+			if (result != UVC_SUCCESS) {
+				LOGW("PHASE 2.5: SET_CUR probe failed (err=%d), trying next format...", result);
+				continue;
+			}
+
+			LOGI("PHASE 2.5: SET_CUR probe succeeded, now GET_CUR to confirm...");
+
+			// Get the negotiated values back
+			result = uvc_query_stream_ctrl(devh, ctrl, 1, UVC_GET_CUR);
+			if (result != UVC_SUCCESS) {
+				LOGW("PHASE 2.5: GET_CUR after SET failed (err=%d), trying next format...", result);
+				continue;
+			}
+
+			LOGI("PHASE 2.5: ✅ Probe negotiation SUCCESS! Device accepted:");
+			LOGI("  bFormatIndex=%d, bFrameIndex=%d", ctrl->bFormatIndex, ctrl->bFrameIndex);
+			LOGI("  dwFrameInterval=%u (%.1f fps)", ctrl->dwFrameInterval,
+				ctrl->dwFrameInterval ? 10000000.0 / ctrl->dwFrameInterval : 0);
+			LOGI("  dwMaxVideoFrameSize=%u", ctrl->dwMaxVideoFrameSize);
+			LOGI("  dwMaxPayloadTransferSize=%u", ctrl->dwMaxPayloadTransferSize);
+
+			// Now try to commit
+			LOGI("PHASE 2.5: Sending COMMIT...");
+			result = uvc_query_stream_ctrl(devh, ctrl, 0, UVC_SET_CUR);  // probe=0 means commit
+			if (result != UVC_SUCCESS) {
+				LOGW("PHASE 2.5: COMMIT failed (err=%d), trying next format...", result);
+				continue;
+			}
+
+			LOGI("PHASE 2.5: ✅✅ COMMIT SUCCESS! Stream is configured!");
+			LOGI("PHASE 2.5: Camera should now be ready for streaming");
+
+			// Note: We don't have frame_desc, so downstream code may fail
+			// But at least we've confirmed the device responds to UVC commands
+			RETURN(UVC_SUCCESS, uvc_error_t);
+		}
+
+		LOGE("PHASE 2.5: All format attempts failed");
+		uvc_release_if(devh, stream_if->bInterfaceNumber);
+	} else {
+		LOGE("PHASE 2.5: No streaming interface found!");
+	}
+
+fallback_failed:
+	LOGE("=== PHASE 2.5 FAILED: Device does not respond to UVC probe/commit ===");
+	LOGE("=== NEXT STEP: Phase 3 - Full reverse engineering required ===");
 	RETURN(UVC_ERROR_INVALID_MODE, uvc_error_t);
 
 found:

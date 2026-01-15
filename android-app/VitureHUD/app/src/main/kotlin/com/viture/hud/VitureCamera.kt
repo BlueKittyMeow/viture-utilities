@@ -191,6 +191,247 @@ class VitureCamera(private val context: Context) {
         try {
             Log.d(TAG, "Opening camera with control block: ${ctrlBlock.deviceName}")
 
+            // =================================================================
+            // PHASE 2.5B: Direct USB probe before UVCCamera.open()
+            // Since Viture uses vendor-specific interfaces (class 0x00),
+            // libuvc won't detect it as UVC. Try direct USB control transfers.
+            // =================================================================
+            Log.d(TAG, "=== PHASE 2.5B: Direct USB interface probe ===")
+
+            val connection = ctrlBlock.connection
+            if (connection != null) {
+                // Get raw USB descriptors
+                val rawDesc = ctrlBlock.rawDescriptors
+                if (rawDesc != null) {
+                    Log.d(TAG, "Raw USB descriptors: ${rawDesc.size} bytes")
+                    // Log first 64 bytes in hex for analysis
+                    val preview = rawDesc.take(64).joinToString(" ") { "%02X".format(it) }
+                    Log.d(TAG, "  First 64 bytes: $preview")
+                }
+
+                // Get USB device info
+                val device = ctrlBlock.device
+                Log.d(TAG, "USB Device: VID=0x${device.vendorId.toString(16)}, PID=0x${device.productId.toString(16)}")
+                Log.d(TAG, "  Interface count: ${device.interfaceCount}")
+
+                // Log all interfaces
+                for (i in 0 until device.interfaceCount) {
+                    val intf = device.getInterface(i)
+                    Log.d(TAG, "  Interface $i: class=${intf.interfaceClass}, subclass=${intf.interfaceSubclass}, protocol=${intf.interfaceProtocol}")
+                    Log.d(TAG, "    Endpoints: ${intf.endpointCount}")
+                    for (e in 0 until intf.endpointCount) {
+                        val ep = intf.getEndpoint(e)
+                        Log.d(TAG, "      EP$e: addr=0x${ep.address.toString(16)}, type=${ep.type}, dir=${ep.direction}")
+                    }
+                }
+
+                // Try UVC probe control on each interface
+                Log.d(TAG, "=== Attempting UVC probe on each interface ===")
+                for (interfaceNum in 0 until device.interfaceCount) {
+                    // Try to claim the interface
+                    val intf = device.getInterface(interfaceNum)
+                    val claimed = connection.claimInterface(intf, true)
+                    if (!claimed) {
+                        Log.w(TAG, "  Interface $interfaceNum: Could not claim")
+                        continue
+                    }
+
+                    // UVC GET_CUR probe (0xA1 = GET, class, interface)
+                    // wValue = VS_PROBE_CONTROL << 8 = 0x0100
+                    val probeData = ByteArray(26)  // UVC 1.0 probe structure
+                    val result = connection.controlTransfer(
+                        0xA1,  // bmRequestType: GET, CLASS, INTERFACE
+                        0x81,  // bRequest: GET_CUR
+                        0x0100, // wValue: VS_PROBE_CONTROL << 8
+                        interfaceNum,  // wIndex: interface number
+                        probeData,
+                        probeData.size,
+                        1000  // timeout 1s
+                    )
+
+                    if (result > 0) {
+                        Log.d(TAG, "  ✅ Interface $interfaceNum: UVC probe SUCCESS! Got $result bytes")
+                        Log.d(TAG, "    Response: ${probeData.take(result).joinToString(" ") { "%02X".format(it) }}")
+                        Log.d(TAG, "    bFormatIndex=${probeData[2]}, bFrameIndex=${probeData[3]}")
+
+                        // Try SET_CUR probe with hardcoded format
+                        val setProbe = ByteArray(26)
+                        setProbe[0] = 0x01  // bmHint
+                        setProbe[2] = 0x01  // bFormatIndex
+                        setProbe[3] = 0x01  // bFrameIndex
+                        // dwFrameInterval = 333333 (30fps) in little-endian
+                        setProbe[4] = 0x15
+                        setProbe[5] = 0x16
+                        setProbe[6] = 0x05
+                        setProbe[7] = 0x00
+
+                        val setResult = connection.controlTransfer(
+                            0x21,  // bmRequestType: SET, CLASS, INTERFACE
+                            0x01,  // bRequest: SET_CUR
+                            0x0100, // wValue: VS_PROBE_CONTROL << 8
+                            interfaceNum,
+                            setProbe,
+                            setProbe.size,
+                            1000
+                        )
+                        Log.d(TAG, "    SET_CUR probe result: $setResult")
+                    } else {
+                        Log.d(TAG, "  Interface $interfaceNum: UVC probe failed (result=$result)")
+                    }
+
+                    connection.releaseInterface(intf)
+                }
+                Log.d(TAG, "=== End of PHASE 2.5B direct USB probe ===")
+
+                // =================================================================
+                // PHASE 2.5C: Try reading directly from bulk endpoints
+                // The device has multiple bulk IN endpoints - try to read data
+                // =================================================================
+                Log.d(TAG, "=== PHASE 2.5C: Direct bulk endpoint read test ===")
+
+                val bulkEndpoints = listOf(0x82, 0x85, 0x87)  // Bulk IN endpoints
+                val intf = device.getInterface(0)
+                val claimed = connection.claimInterface(intf, true)
+
+                if (claimed) {
+                    for (epAddr in bulkEndpoints) {
+                        // Find the endpoint
+                        var endpoint: android.hardware.usb.UsbEndpoint? = null
+                        for (i in 0 until intf.endpointCount) {
+                            val ep = intf.getEndpoint(i)
+                            if (ep.address == epAddr) {
+                                endpoint = ep
+                                break
+                            }
+                        }
+
+                        if (endpoint != null) {
+                            Log.d(TAG, "  Testing endpoint 0x${epAddr.toString(16)}...")
+                            val buffer = ByteArray(16384)  // 16KB buffer
+
+                            // Try multiple reads
+                            for (attempt in 1..3) {
+                                val bytesRead = connection.bulkTransfer(endpoint, buffer, buffer.size, 500)
+                                if (bytesRead > 0) {
+                                    Log.d(TAG, "    ✅ Attempt $attempt: Read $bytesRead bytes!")
+                                    val preview = buffer.take(min(32, bytesRead)).joinToString(" ") { "%02X".format(it) }
+                                    Log.d(TAG, "    First 32 bytes: $preview")
+
+                                    // Check for video signatures
+                                    if (bytesRead > 3) {
+                                        if (buffer[0] == 0xFF.toByte() && buffer[1] == 0xD8.toByte()) {
+                                            Log.d(TAG, "    🎉 MJPEG signature detected!")
+                                        }
+                                        if (buffer[0] == 0x00.toByte() && buffer[1] == 0x00.toByte() &&
+                                            buffer[2] == 0x00.toByte() && buffer[3] == 0x01.toByte()) {
+                                            Log.d(TAG, "    🎉 H.264 NAL start code detected!")
+                                        }
+                                    }
+                                } else {
+                                    Log.d(TAG, "    Attempt $attempt: No data (result=$bytesRead)")
+                                }
+                            }
+                        }
+                    }
+                    connection.releaseInterface(intf)
+                } else {
+                    Log.w(TAG, "  Could not claim interface for bulk read test")
+                }
+                Log.d(TAG, "=== End of PHASE 2.5C ===")
+
+                // =================================================================
+                // PHASE 2.5D: Try sending init commands to OUT endpoints
+                // The device might need a "start streaming" command
+                // =================================================================
+                Log.d(TAG, "=== PHASE 2.5D: Try initialization commands ===")
+
+                val claimed2 = connection.claimInterface(intf, true)
+                if (claimed2) {
+                    // Find OUT endpoints
+                    var ep04: android.hardware.usb.UsbEndpoint? = null
+                    var ep06: android.hardware.usb.UsbEndpoint? = null
+                    var ep82: android.hardware.usb.UsbEndpoint? = null
+
+                    for (i in 0 until intf.endpointCount) {
+                        val ep = intf.getEndpoint(i)
+                        when (ep.address) {
+                            0x04 -> ep04 = ep
+                            0x06 -> ep06 = ep
+                            0x82 -> ep82 = ep
+                        }
+                    }
+
+                    // Try various vendor control transfers to initialize camera
+                    Log.d(TAG, "  Trying vendor control transfers...")
+
+                    // Common camera init commands: bRequest values 0x01 (init), 0x80 (get status), etc.
+                    val vendorGetStatus = connection.controlTransfer(
+                        0xC0,  // bmRequestType: GET, VENDOR, DEVICE
+                        0x00,  // bRequest: generic status
+                        0x0000, // wValue
+                        0x0000, // wIndex
+                        ByteArray(64),
+                        64,
+                        1000
+                    )
+                    Log.d(TAG, "    Vendor GET (req=0x00): $vendorGetStatus bytes")
+
+                    // Try start streaming command
+                    val startCmd = byteArrayOf(0x01)  // Simple start command
+                    if (ep04 != null) {
+                        val sendResult = connection.bulkTransfer(ep04, startCmd, startCmd.size, 1000)
+                        Log.d(TAG, "    Sent 0x01 to EP04: result=$sendResult")
+
+                        // Try reading from EP82 after sending command
+                        if (ep82 != null) {
+                            Thread.sleep(100)
+                            val buffer = ByteArray(16384)
+                            val bytesRead = connection.bulkTransfer(ep82, buffer, buffer.size, 1000)
+                            if (bytesRead > 64) {
+                                Log.d(TAG, "    ✅ After cmd: Read $bytesRead bytes from EP82!")
+                                val preview = buffer.take(min(48, bytesRead)).joinToString(" ") { "%02X".format(it) }
+                                Log.d(TAG, "    Data: $preview")
+                            } else {
+                                Log.d(TAG, "    After cmd: Read $bytesRead bytes (still just header)")
+                            }
+                        }
+                    }
+
+                    // Try different control transfer types
+                    val reqTypes = listOf(0x01, 0x02, 0x10, 0x20, 0x80, 0x81)
+                    for (req in reqTypes) {
+                        val result = connection.controlTransfer(
+                            0x40,  // SET, VENDOR, DEVICE
+                            req,
+                            0x0001,  // wValue: enable?
+                            0x0000,  // wIndex
+                            null, 0, 1000
+                        )
+                        if (result >= 0) {
+                            Log.d(TAG, "    ✅ Vendor SET req=0x${req.toString(16)}: success ($result)")
+
+                            // Check if this started streaming
+                            if (ep82 != null) {
+                                Thread.sleep(100)
+                                val buffer = ByteArray(32768)
+                                val bytesRead = connection.bulkTransfer(ep82, buffer, buffer.size, 500)
+                                if (bytesRead > 64) {
+                                    Log.d(TAG, "      🎉 Got $bytesRead bytes after command!")
+                                    val preview = buffer.take(min(64, bytesRead)).joinToString(" ") { "%02X".format(it) }
+                                    Log.d(TAG, "      Data: $preview")
+                                }
+                            }
+                        }
+                    }
+
+                    connection.releaseInterface(intf)
+                }
+                Log.d(TAG, "=== End of PHASE 2.5D ===")
+
+            } else {
+                Log.w(TAG, "PHASE 2.5B: No USB connection available")
+            }
+
             // Create UVCCamera instance
             uvcCamera = UVCCamera()
             uvcCamera?.open(ctrlBlock)

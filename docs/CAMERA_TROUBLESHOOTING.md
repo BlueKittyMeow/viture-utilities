@@ -967,96 +967,193 @@ CameraFi likely uses **standard UVC probe/commit sequence** with hardcoded forma
 
 ---
 
-## Phase 2.5: Proposed Manual Stream Control (Next Step)
+## Phase 2.5: Manual Stream Control Implementation (COMPLETED)
 
-### Hypothesis
-The Viture camera might accept standard UVC probe/commit commands with explicit format values, even though `getSupportedSizeList()` returns empty.
+### Summary
+**Result: ❌ FAILED - Device is NOT UVC-compatible**
 
-### Approach: Direct UVC Stream Control
+Phase 2.5 testing revealed that the Viture Luma Pro camera uses a **completely proprietary protocol**, not UVC at all.
 
-Bypass UVCCamera's `setPreviewSize()` and manually configure streaming:
+---
 
-**Implementation Strategy:**
-```kotlin
-// Instead of: uvcCamera.setPreviewSize(...)
+### Phase 2.5A: Native libuvc Fallback
 
-// 1. Create stream control block manually
-val streamCtrl = UVC_STREAM_CTRL_BLOCK()
-streamCtrl.formatIndex = 1  // First format (try MJPEG)
-streamCtrl.frameIndex = 1   // First frame size
-streamCtrl.dwFrameInterval = 333333  // 30 FPS (or 200000 for 5 FPS)
-streamCtrl.dwMaxVideoFrameSize = 1920 * 1080 * 2  // Buffer size
+**Implemented:** Added fallback code in `stream.c` to try hardcoded probe/commit when no format descriptors found.
 
-// 2. Send PROBE control transfer
-uvcCamera.sendProbeControl(streamCtrl)
-
-// 3. Send COMMIT control transfer
-uvcCamera.sendCommitControl(streamCtrl)
-
-// 4. Start streaming
-uvcCamera.startPreview()
+**Result:**
+```
+=== PHASE 2.5: No format descriptors found, trying hardcoded probe/commit ===
+PHASE 2.5: No streaming interface found!
+=== PHASE 2.5 FAILED: Device does not respond to UVC probe/commit ===
 ```
 
-**UVC Probe/Commit Protocol:**
-- **SET_CUR(PROBE)**: Negotiate format parameters
-- **GET_CUR(PROBE)**: Camera returns adjusted parameters
-- **SET_CUR(COMMIT)**: Commit to negotiated format
-- **Start streaming**
-
-### Format Values to Try
-
-| Parameter | MJPEG Try 1 | YUYV Try 2 | Notes |
-|-----------|-------------|------------|-------|
-| Format Code | 0x06 | 0x04 | MJPEG vs Uncompressed |
-| Format Index | 1 | 1 | First format |
-| Frame Index | 1 | 1 | First resolution |
-| Width | 1920 | 1920 | From spec |
-| Height | 1080 | 1080 | From spec |
-| FPS | 30 or 5 | 30 or 5 | Try both |
-| Frame Interval | 333333 (30fps) | 333333 (30fps) | 100ns units |
-
-### Success Criteria
-- ✅ Probe/commit succeed without errors
-- ✅ `startPreview()` begins streaming
-- ✅ Frame callback receives data
-- ✅ Data has MJPEG signature (FF D8 FF) or valid YUYV pattern
-
-### Time Estimate
-**30-60 minutes** - Quick test before full reverse engineering
-
-### Why This Might Work
-1. CameraFi uses standard UVC functions (`uvc_get_stream_ctrl_format_size`)
-2. Viture camera responds to standard UVC probe/commit (just doesn't advertise formats)
-3. We can hardcode the parameters CameraFi must be using
-4. Much faster than 6-12 hour reverse engineering effort
+**Root Cause:** libuvc never creates `stream_ifs` because:
+1. No UVC Video Control interface exists (class 0x0E)
+2. Device uses vendor-specific interface (class 0x00)
+3. UVC descriptor parsing never triggers
 
 ---
 
-## Decision Point
+### Phase 2.5B: Direct USB Interface Probe
 
-**Three Options:**
+**Purpose:** Analyze USB descriptors and interfaces directly via Android USB API.
 
-**Option A: Manual Probe/Commit Test** ⭐ RECOMMENDED
-- Time: 30-60 minutes
-- Success probability: 30-40%
-- Implements direct UVC stream control
-- Quick test before heavy lifting
+**Findings:**
+```
+USB Device: VID=0x35ca, PID=0x1101
+Interface count: 1
+Interface 0: class=0, subclass=0, protocol=0 (VENDOR-SPECIFIC!)
+  Endpoints: 7
+    EP1 (0x81): Interrupt IN  - Status/events
+    EP2 (0x82): Bulk IN       - DATA CHANNEL (returns 64 bytes!)
+    EP3 (0x83): Interrupt IN
+    EP4 (0x04): Bulk OUT      - COMMAND CHANNEL (accepts writes!)
+    EP5 (0x85): Bulk IN       - Inactive
+    EP6 (0x06): Bulk OUT      - Secondary command
+    EP7 (0x87): Bulk IN       - Inactive
+```
 
-**Option B: Full Reverse Engineering**
-- Time: 6-12 hours
-- Success probability: 80-90%
-- Requires Ghidra/IDA Pro setup
-- Deep dive into libVaultUVC.so
-
-**Option C: USB Sniffing Alternative**
-- Time: 2-4 hours
-- Success probability: 50-60%
-- Requires connecting phone via USB cable to Linux host
-- May still face rooting/permission issues
-
-**Recommendation:** Try Option A first (30-60 min quick test), fall back to Option B if needed.
+**Key Discovery:**
+- **Interface class = 0** (vendor-specific), NOT 0x0E (UVC)!
+- Device has multiple bulk endpoints (not isochronous like UVC)
+- Standard UVC control transfers return -1 (not supported)
 
 ---
 
-**Status:** Phase 2 library analysis complete. Identified key libraries and Viture VID. Ready for Phase 2.5 (manual probe/commit test).
-**Next Update:** After manual stream control implementation and testing
+### Phase 2.5C: Bulk Endpoint Read Test
+
+**Purpose:** Try reading data from bulk IN endpoints without initialization.
+
+**Results:**
+```
+Testing endpoint 0x82...
+✅ Attempt 1: Read 64 bytes!
+First 32 bytes: B2 C4 C2 D7 FC 3B FC 44 BE 7B 14 43 DB DD A3 37 ...
+✅ Attempt 2: Read 64 bytes! (identical)
+✅ Attempt 3: Read 64 bytes! (identical)
+
+Testing endpoint 0x85... No data (-1)
+Testing endpoint 0x87... No data (-1)
+```
+
+**Analysis:**
+- EP82 returns **64 bytes of static data** - likely device identification or encrypted handshake
+- Data does NOT match video signatures:
+  - No MJPEG (FF D8 FF)
+  - No H.264 (00 00 00 01)
+  - Possibly encrypted or status response
+- EP85 and EP87 inactive without initialization
+
+---
+
+### Phase 2.5D: Initialization Command Testing
+
+**Purpose:** Try vendor control transfers and bulk writes to trigger streaming.
+
+**Results:**
+```
+Vendor GET (req=0x00): -1 bytes (not supported)
+Sent 0x01 to EP04: result=1 ✅ (accepted!)
+After cmd: Read 64 bytes (still just header - no streaming)
+Vendor SET commands: All returned -1 (not supported)
+```
+
+**Key Findings:**
+- ✅ **EP04 accepts bulk writes** - Command channel is functional
+- ❌ Simple 0x01 command doesn't trigger streaming
+- ❌ Vendor control transfers (0x40/0xC0) not supported
+- Device requires proprietary initialization sequence
+
+---
+
+## Definitive Conclusions
+
+### 1. Viture Luma Pro is NOT a UVC Device
+
+| Feature | Standard UVC | Viture Luma Pro |
+|---------|--------------|-----------------|
+| Interface Class | 0x0E (Video) | 0x00 (Vendor) |
+| Transfer Type | Isochronous | Bulk |
+| Control Protocol | UVC GET/SET | Proprietary |
+| Format Descriptors | Present | None |
+| Probe/Commit | Supported | Not Supported |
+
+### 2. Device Communication Architecture
+
+```
+┌─────────────────────────────────────────────┐
+│           VITURE LUMA PRO USB              │
+├─────────────────────────────────────────────┤
+│  Interface 0 (class=0, vendor-specific)    │
+│  ├── EP81 (Interrupt IN) - Status          │
+│  ├── EP82 (Bulk IN) - Video/Data ★         │
+│  ├── EP83 (Interrupt IN)                   │
+│  ├── EP04 (Bulk OUT) - Commands ★          │
+│  ├── EP85 (Bulk IN) - Secondary data       │
+│  ├── EP06 (Bulk OUT) - Secondary cmd       │
+│  └── EP87 (Bulk IN) - Tertiary data        │
+└─────────────────────────────────────────────┘
+```
+
+### 3. Why CameraFi Works
+
+CameraFi's `libVaultUVC.so` contains:
+- **Viture VID (0x35ca) at offset 0x7c80** - Special case handling
+- **Proprietary initialization sequence** - Unknown command format
+- **Custom streaming protocol** - Bulk transfers, not UVC
+
+---
+
+## Phase 3: Required Next Steps
+
+### Option A: Reverse Engineer libVaultUVC.so ⭐ REQUIRED
+- **Time:** 6-12 hours
+- **Success probability:** 80-90%
+- **Tools:** Ghidra, IDA Pro, or Binary Ninja
+- **Target:** Find Viture initialization sequence
+- **Note:** This is now the only viable path forward
+
+### Option B: Contact Viture for SDK
+- **Time:** Days to weeks
+- **Success probability:** Unknown
+- **Approach:** Request official SDK or documentation
+- **Risk:** May not be publicly available
+
+### Option C: USB Traffic Capture (Alternative)
+- **Time:** 4-8 hours
+- **Success probability:** 70-80%
+- **Approach:** Connect phone to PC via USB cable, capture CameraFi traffic
+- **Challenge:** Requires physical USB connection (currently using wireless ADB)
+
+---
+
+## Technical Reference
+
+### EP82 Static Data Analysis
+```
+Offset  Data
+0x00    B2 C4 C2 D7 FC 3B FC 44  <- Possibly device serial (first 8 bytes repeat)
+0x08    BE 7B 14 43 DB DD A3 37
+0x10    7B C3 95 91 FB 15 8F B9
+0x18    3E 38 D0 38 DA 9C 53 B4
+... (64 bytes total)
+```
+
+### Raw USB Descriptors (85 bytes)
+```
+12 01 10 02 00 00 00 40  <- Device descriptor
+CA 35 01 11 01 00 10 20  <- VID=35CA, PID=1101
+00 01 09 02 43 00 01 01  <- Config descriptor
+30 C0 01 09 04 00 00 07  <- Interface 0, 7 endpoints
+00 00 00 40 07 05 81 03  <- EP81: Interrupt IN, 1024 bytes
+00 04 03 07 05 82 02 00  <- EP82: Bulk IN, 512 bytes
+02 00 07 05 83 03 00 02  <- EP83: Interrupt IN
+04 07 05 04 02 00 02 00  <- EP04: Bulk OUT
+...
+```
+
+---
+
+**Status:** Phase 2.5 COMPLETE. Viture camera confirmed as non-UVC device. Phase 3 (reverse engineering) required.
+
+**Next Update:** After libVaultUVC.so reverse engineering
