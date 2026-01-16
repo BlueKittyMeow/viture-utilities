@@ -235,17 +235,77 @@ The VIO library uses OpenCV for stereo processing:
 3. **Parse the response frames** from EP 0x85
 4. **Alternative**: Load `libcarina_vio.so` and call the API directly
 
-### Potential Command Structure (EP 0x04)
+### Stereo Camera Command Structure (EP 0x04)
 
-Based on the 13-byte command size and the framed protocol from `libglasses.so`,
-the stereo camera command may follow a similar format:
+From disassembly of `libcarina_vio.so` at address `0x951ecc-0x951ef0`:
+
+**13-byte Command Format:**
 
 ```
-Bytes 0-1: Magic (0xFEFF?)
-Bytes 2-3: CRC-16
-Bytes 4-5: Length
-Bytes 6+:  Command ID + params
+Offset | Size | Field        | Example Value
+-------|------|--------------|---------------
+0-1    | 2    | Magic        | 0xFA55 (LE) = 0x55FA
+2      | 1    | Command type | 0xEA
+3-4    | 2    | Size param   | 0x0008 (LE) = 2048
+5      | 1    | Flag         | 0x01
+6      | 1    | Camera ID    | 0x00 or 0x01
+7-12   | 6    | Reserved     | 0x00 (zeros)
 ```
+
+**Assembly Evidence:**
+
+```asm
+951ecc:   mov  w8, #0x55fa              // Magic value
+951ed0:   mov  w9, #0xea                // Command type
+951ed4:   mov  w10, #0x800              // Size = 2048
+951ed8:   mov  w11, #0x1                // Flag
+...
+951ee4:   strh w8, [x19]                // Store magic at offset 0
+951ee8:   strb w9, [x19, #2]            // Store cmd at offset 2
+951eec:   sturh w10, [x19, #3]          // Store size at offset 3
+951ef0:   strb w11, [x19, #5]           // Store flag at offset 5
+```
+
+**5-byte Short Command Format:**
+
+Some commands use a shorter 5-byte format (observed at `0x952448`):
+
+```
+Offset | Size | Field
+-------|------|------
+0-4    | 5    | Command bytes (structure TBD)
+```
+
+### Additional Carina API Functions
+
+| Function | Purpose |
+|----------|---------|
+| `carina_a1088_get_sn` | Get device serial number |
+| `carina_a1088_send_custom_data` | Send custom data to device |
+| `carina_a1088_read_custom_data` | Read custom data from device |
+| `carina_a1088_switch_display_mode` | Switch display mode |
+| `carina_a1088_reset_pose` | Reset VIO pose |
+| `carina_a1088_get_config_des` | Get configuration descriptor |
+
+### Probe Tool
+
+A Python probe tool is available at `tools/stereo_camera_probe.py`:
+
+```bash
+# List USB endpoints
+sudo python3 tools/stereo_camera_probe.py --list-endpoints
+
+# Probe stereo cameras with discovered command
+sudo python3 tools/stereo_camera_probe.py --probe
+
+# Scan with various command variations
+sudo python3 tools/stereo_camera_probe.py --scan
+```
+
+**Requirements:**
+- pyusb: `pip install pyusb`
+- libusb backend installed
+- Root/sudo access for USB
 
 ## References
 
